@@ -1,2 +1,9 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+	import Slides from '$lib/deck/slides.svelte';
+</script>
+
+<svelte:head>
+	<title>Presentation</title>
+</svelte:head>
+
+<Slides />
