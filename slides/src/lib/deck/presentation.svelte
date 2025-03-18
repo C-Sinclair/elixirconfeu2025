@@ -1,14 +1,9 @@
 <script>
-	import Code from './code.svelte';
-	import Notes from './notes.svelte';
-
-	// import all markdown files from slides directory
-	const slides = import.meta.glob('$lib/slides/*.md');
-
-	// order by file name
-	const slideKeys = Object.keys(slides).sort((a, b) => a.localeCompare(b));
+	export let slides;
 </script>
 
-{#each slideKeys as slideKey}
-	<section data-auto-animate data-markdown={slideKey}></section>
+{#each slides as slide, i}
+	<section data-auto-animate>
+		<svelte:component this={slide.default} />
+	</section>
 {/each}

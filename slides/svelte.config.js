@@ -1,10 +1,11 @@
 import { mdsvex } from 'mdsvex';
 import adapter from '@sveltejs/adapter-auto';
+import mdsvexConfig from './mdsvex.config.js';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	compilerOptions: {
-		runes: true
+		runes: false
 	},
 	kit: {
 		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
@@ -12,8 +13,8 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter()
 	},
-	preprocess: [mdsvex()],
-	extensions: ['.svelte', '.svx']
+	preprocess: [mdsvex(mdsvexConfig)],
+	extensions: ['.svelte', '.svx', '.md']
 };
 
 export default config;
