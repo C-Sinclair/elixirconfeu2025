@@ -3,6 +3,22 @@
 
 @import '@catppuccin/highlightjs/css/catppuccin-mocha.css';
 
+:root {
+
+	--font-size-00: .5rem;
+	--font-size-0: .75rem;
+	--font-size-1: 1rem;
+	--font-size-2: 1.1rem;
+	--font-size-3: 1.25rem;
+	--font-size-4: 1.5rem;
+	--font-size-5: 2rem;
+	--font-size-6: 2.5rem;
+	--font-size-7: 3rem;
+	--font-size-8: 3.5rem;
+	--font-size-9: 4rem;
+	--font-size-10: 4.5rem;
+}
+
 /**
  * Catppuccin theme for reveal.js.
  * Credit: https://github.com/catppuccin/catppuccin/discussions/1836#discussioncomment-9421709
@@ -35,10 +51,10 @@ body {
 	--r-heading-text-shadow: none;
 	--r-heading-font-weight: normal;
 	--r-heading1-text-shadow: none;
-	--r-heading1-size: 3.77em;
-	--r-heading2-size: 2.11em;
-	--r-heading3-size: 1.55em;
-	--r-heading4-size: 1em;
+	--r-heading1-size: var(--font-size-10);
+	--r-heading2-size: var(--font-size-8);
+	--r-heading3-size: var(--font-size-6);
+	--r-heading4-size: var(--font-size-4);
 	--r-code-font: monospace;
 	--r-link-color: #74c7ec;
 	--r-link-color-dark: #89b4fa;
@@ -124,6 +140,7 @@ body {
 .reveal p {
 	margin: var(--r-block-margin) 0;
 	line-height: 1.3;
+	font-size: var(--font-size-4);
 }
 
 /* Remove trailing margins after titles */
@@ -366,29 +383,3 @@ body {
 	}
 }
 
-/* 
-:root {
-	--r-main-font: 'Manrope';
-	--r-heading-font: 'Manrope';
-	--r-code-font: 'JetBrains Mono';
-	--r-link-color: aqua;
-	--r-link-color-hover: aqua;
-}
-
-.hljs {
-	background: none;
-}
-
-.hljs-title,
-.hljs-keyword {
-	font-weight: normal;
-}
-
-.reveal pre,
-.reveal code {
-	overflow: hidden !important;
-}
-
-.reveal pre {
-	box-shadow: none;
-} */

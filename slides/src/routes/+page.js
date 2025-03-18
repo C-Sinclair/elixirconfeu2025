@@ -17,8 +17,6 @@ export async function load() {
 
 	const slides = await Promise.all(slidePromises);
 
-	console.log(slides);
-
 	return {
 		slides
 	};

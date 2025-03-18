@@ -2,10 +2,11 @@
 import MeCard from '$lib/components/MeCard.svelte'
 </script>
 
-# Elixir, Langchain, and LLMs
+# Meta-Programming in Elixir
 
-## Building Intelligent Tools with Metaprogramming
+## Dynamic Function Calling with LLMs
+
+May 2025
 
 <MeCard />
 
-May 2025

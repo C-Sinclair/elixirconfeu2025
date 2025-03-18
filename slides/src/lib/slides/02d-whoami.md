@@ -1,0 +1,8 @@
+
+# `whoami`
+
+- No CompSci background
+- Self taught Javascript canvas ninja
+- PHP agency work 💜 jQuery 
+- React embedded in C++ desktop application
+- Next.JS (~ v12) 

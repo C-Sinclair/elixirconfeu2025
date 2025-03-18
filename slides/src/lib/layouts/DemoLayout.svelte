@@ -1,12 +1,10 @@
 <script>
 	// The mdsvex layout receives these props
 	export let components = {};
-
-	console.log('default layout');
-	console.table(components);
 </script>
 
 <div>
-	<p>Default Layout</p>
 	<slot />
+
+	<p>Demo</p>
 </div>

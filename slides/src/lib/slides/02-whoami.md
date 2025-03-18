@@ -1,0 +1,4 @@
+
+# `whoami`
+
+- No CompSci background

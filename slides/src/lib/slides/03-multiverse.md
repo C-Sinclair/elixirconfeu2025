@@ -1,10 +1,4 @@
-<script>
-// Empty script to enable runes mode
-</script>
 
-# My Role at Multiverse
+# Multiverse
 
-- Brief description of Multiverse
-- Your position and responsibilities
-- Team structure
-- Key projects
+> The working world has changed, but learning hasn’t

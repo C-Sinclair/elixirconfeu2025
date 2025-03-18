@@ -1,6 +1,6 @@
-<script>
-// Empty script to enable runes mode
-</script>
+---
+layout: demo
+---
 
 # Example Application
 
