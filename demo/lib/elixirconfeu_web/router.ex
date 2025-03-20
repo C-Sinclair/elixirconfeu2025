@@ -26,6 +26,10 @@ defmodule ElixirConfEUWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    # Chat routes
+    live "/chat", ChatLive, :index
+    live "/chat/:id", ChatLive, :show
   end
 
   # Special route for iframe content

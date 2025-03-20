@@ -2,4 +2,29 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+:root {
+  --background-color: #1e1e2e;
+
+  --text-color: #cdd6f4;
+
+  --border-color: #585b70;
+}
+
 /* This file is for your main application CSS */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+input[type="text"] {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: none;
+  outline: none;
+  box-shadow: none;
+  &:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+}
