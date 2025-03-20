@@ -1,4 +1,4 @@
-<div class="h-[calc(100vh-50px)] flex" phx-hook="Chat" id="chat-container">
+<div class="h-[calc(100vh-50px)] flex">
   
 <!-- Chat Area -->
   <div class="flex-1 flex flex-col">
@@ -69,16 +69,6 @@
             Send
           </button>
         </form>
-      </div>
-    </div>
-
-    <div
-      :if={!@current_conversation}
-      class="flex-1 flex items-center justify-center text-gray-500"
-    >
-      <div class="text-center">
-        <h3 class="text-xl font-semibold mb-2">No conversation selected</h3>
-        <p>Create a new conversation or select an existing one</p>
       </div>
     </div>
   </div>

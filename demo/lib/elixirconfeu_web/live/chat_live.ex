@@ -2,13 +2,11 @@ defmodule ElixirConfEUWeb.ChatLive do
   use ElixirConfEUWeb, :live_view
 
   alias ElixirConfEU.Chat
-  alias ElixirConfEU.Chat.{Conversation, Message, FunctionCall}
 
   @impl true
   def mount(_params, _session, socket) do
     {:ok,
      socket
-     |> assign(:conversations, Chat.list_conversations())
      |> assign(:current_conversation, nil)
      |> assign(:messages, [])
      |> assign(:user_input, "")
@@ -43,8 +41,7 @@ defmodule ElixirConfEUWeb.ChatLive do
 
     messages = Chat.list_messages(conversation.id)
 
-    # In a real app, here's where you would send the message to your LLM service
-    # and handle the response asynchronously
+    # TODO: Call the LLM here
 
     {:noreply,
      socket
@@ -61,13 +58,12 @@ defmodule ElixirConfEUWeb.ChatLive do
 
     {:noreply,
      socket
-     |> assign(:conversations, Chat.list_conversations())
-     |> push_redirect(to: ~p"/chat/#{conversation.id}")}
+     |> push_navigate(to: ~p"/chat/#{conversation.id}")}
   end
 
   @impl true
   def handle_event("select_conversation", %{"id" => id}, socket) do
-    {:noreply, push_redirect(socket, to: ~p"/chat/#{id}")}
+    {:noreply, push_navigate(socket, to: ~p"/chat/#{id}")}
   end
 
   @impl true
