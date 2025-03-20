@@ -1,6 +1,3 @@
-<script>
-// Empty script to enable runes mode
-</script>
 
 # Elixir's Macro System
 

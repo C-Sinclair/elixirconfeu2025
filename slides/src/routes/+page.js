@@ -12,7 +12,7 @@ export async function load() {
 			/** @type {App.MdsvexFile} */
 			// @ts-ignore
 			const file = await resolver();
-			return file;
+			return { path, ...file };
 		});
 
 	const slides = await Promise.all(slidePromises);

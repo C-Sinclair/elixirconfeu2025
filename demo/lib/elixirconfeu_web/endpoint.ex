@@ -48,6 +48,48 @@ defmodule ElixirConfEUWeb.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
+
+  # Custom plug to allow framing from localhost
+  plug ElixirConfEUWeb.FrameOptionsPlug
+
+  # Add CSP headers to allow framing
+  plug ElixirConfEUWeb.CSPHeadersPlug
+
+  # Add CORS plug to handle cross-origin requests from the slides
+  plug CORSPlug,
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:5173",
+      # Adding all common localhost variations
+      "http://localhost:4173",
+      "http://127.0.0.1:4173",
+      "http://localhost:8080",
+      "http://127.0.0.1:8080",
+      # Allow all origins in development
+      "http://localhost",
+      "http://127.0.0.1"
+    ],
+    headers: [
+      "Authorization",
+      "Content-Type",
+      "Accept",
+      "Origin",
+      "User-Agent",
+      "DNT",
+      "Cache-Control",
+      "X-Mx-ReqToken",
+      "Keep-Alive",
+      "X-Requested-With",
+      "If-Modified-Since",
+      "X-CSRF-Token",
+      "X-XSRF-Token"
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    max_age: 86400,
+    credentials: true
+
   plug Plug.Session, @session_options
   plug ElixirConfEUWeb.Router
 end

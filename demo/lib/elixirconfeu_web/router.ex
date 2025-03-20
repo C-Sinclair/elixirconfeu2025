@@ -10,6 +10,14 @@ defmodule ElixirConfEUWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  # Pipeline for iframe content - without security headers
+  pipeline :iframe do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, html: {ElixirConfEUWeb.Layouts, :root}
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -18,6 +26,13 @@ defmodule ElixirConfEUWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+  end
+
+  # Special route for iframe content
+  scope "/iframe", ElixirConfEUWeb do
+    pipe_through :iframe
+
+    get "/", PageController, :iframe
   end
 
   # Other scopes may use custom stacks.
