@@ -37,6 +37,14 @@ defmodule ElixirConfEUWeb.ChatLive do
   def handle_event("submit_message", %{"user_input" => user_input}, socket) do
     conversation = socket.assigns.current_conversation || create_default_conversation()
 
+    # If this is a new conversation, update the URL
+    socket =
+      if socket.assigns.current_conversation == nil do
+        push_patch(socket, to: ~p"/chat/#{conversation.id}")
+      else
+        socket
+      end
+
     {:ok, message} =
       Chat.create_message(%{
         content: user_input,
@@ -57,20 +65,6 @@ defmodule ElixirConfEUWeb.ChatLive do
      |> assign(:current_conversation, conversation)
      |> assign(:user_input, "")
      |> assign(:loading, true)}
-  end
-
-  @impl true
-  def handle_event("create_conversation", _params, socket) do
-    {:ok, conversation} = Chat.create_conversation(%{title: "New Conversation"})
-
-    {:noreply,
-     socket
-     |> push_navigate(to: ~p"/chat/#{conversation.id}")}
-  end
-
-  @impl true
-  def handle_event("select_conversation", %{"id" => id}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/chat/#{id}")}
   end
 
   @impl true

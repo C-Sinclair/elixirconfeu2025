@@ -33,6 +33,13 @@ defmodule ElixirConfEU.Chat do
     %Conversation{}
     |> Conversation.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, conversation} ->
+        {:ok, Repo.preload(conversation, [:messages, :function_calls])}
+
+      error ->
+        error
+    end
   end
 
   @doc """
