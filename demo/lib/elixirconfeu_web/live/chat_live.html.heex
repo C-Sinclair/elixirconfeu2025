@@ -10,36 +10,41 @@
             <div class={if message.role == "user", do: "text-4xl", else: ""}>
               {message.content}
             </div>
-
+          </div>
+          
+<!-- Function Calls Section -->
+          <div
+            :if={
+              @current_conversation.function_calls &&
+                length(@current_conversation.function_calls) > 0
+            }
+            class="p-4 rounded-lg max-w-3xl"
+          >
             <div
-              :if={message.function_calls && length(message.function_calls) > 0}
-              class="mt-2 border-t border-gray-200 pt-2"
+              :for={function_call <- @current_conversation.function_calls}
+              class="flex flex-col gap-2 p-2 rounded-md text-sm"
             >
-              <div class="text-sm font-medium text-gray-500">Function Calls:</div>
-              <div
-                :for={function_call <- message.function_calls}
-                class="mt-1 bg-gray-100 p-2 rounded-md text-sm"
-              >
-                <div class="font-mono text-blue-600">{function_call.function_name}</div>
-                <div class="mt-1">
-                  <div class="font-semibold text-xs">Parameters:</div>
-                  <pre class="text-xs bg-gray-50 p-1 rounded"><%= Jason.encode!(function_call.parameters, pretty: true) %></pre>
-                </div>
-                <div :if={function_call.result} class="mt-1">
-                  <div class="font-semibold text-xs">Result:</div>
-                  <pre class="text-xs bg-gray-50 p-1 rounded"><%= function_call.result %></pre>
-                </div>
+              <div class="font-mono text-blue-400">
+                {function_call.module}.{function_call.function}/1
+              </div>
+              <div class="">
+                <div class="font-semibold text-xs">Parameters:</div>
+                <pre class="text-xs p-1 rounded"><%= Jason.encode!(function_call.parameters, pretty: true) %></pre>
+              </div>
+              <div :if={function_call.result} class="">
+                <div class="font-semibold text-xs">Result:</div>
+                <pre class="text-xs p-1 rounded"><%= function_call.result %></pre>
               </div>
             </div>
           </div>
 
-          <div :if={@loading} class="bg-gray-50 p-4 rounded-lg max-w-3xl">
+          <div :if={@loading} class="p-4 rounded-lg max-w-3xl">
             <div class="flex items-center space-x-2">
               <div class="font-semibold">Assistant</div>
               <div class="animate-pulse flex space-x-1">
-                <div class="h-2 w-2 bg-gray-400 rounded-full"></div>
-                <div class="h-2 w-2 bg-gray-400 rounded-full"></div>
-                <div class="h-2 w-2 bg-gray-400 rounded-full"></div>
+                <div class="h-2 w-2 rounded-full"></div>
+                <div class="h-2 w-2 rounded-full"></div>
+                <div class="h-2 w-2 rounded-full"></div>
               </div>
             </div>
           </div>

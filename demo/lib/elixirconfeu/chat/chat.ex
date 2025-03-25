@@ -18,12 +18,12 @@ defmodule ElixirConfEU.Chat do
   end
 
   @doc """
-  Gets a single conversation with its associated messages.
+  Gets a single conversation with its associated messages and function calls.
   """
   def get_conversation!(id) do
     Conversation
     |> Repo.get!(id)
-    |> Repo.preload(messages: [:function_calls])
+    |> Repo.preload([:messages, :function_calls])
   end
 
   @doc """
@@ -77,18 +77,27 @@ defmodule ElixirConfEU.Chat do
     |> where(conversation_id: ^conversation_id)
     |> order_by(asc: :inserted_at)
     |> Repo.all()
-    |> Repo.preload(:function_calls)
   end
 
   # Function call functions
 
   @doc """
-  Creates a function call.
+  Creates a function call at the conversation level.
   """
   def create_function_call(attrs \\ %{}) do
     %FunctionCall{}
     |> FunctionCall.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Lists function calls for a specific conversation.
+  """
+  def list_function_calls(conversation_id) do
+    FunctionCall
+    |> where(conversation_id: ^conversation_id)
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
   end
 
   @doc """
@@ -98,15 +107,5 @@ defmodule ElixirConfEU.Chat do
     function_call
     |> FunctionCall.changeset(attrs)
     |> Repo.update()
-  end
-
-  @doc """
-  Lists function calls for a specific message.
-  """
-  def list_function_calls(message_id) do
-    FunctionCall
-    |> where(message_id: ^message_id)
-    |> order_by(asc: :inserted_at)
-    |> Repo.all()
   end
 end

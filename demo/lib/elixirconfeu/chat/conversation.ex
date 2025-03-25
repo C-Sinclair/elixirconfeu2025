@@ -6,6 +6,7 @@ defmodule ElixirConfEU.Chat.Conversation do
     field :title, :string
 
     has_many :messages, ElixirConfEU.Chat.Message
+    has_many :function_calls, ElixirConfEU.Chat.FunctionCall
 
     timestamps()
   end

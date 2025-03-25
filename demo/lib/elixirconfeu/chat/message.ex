@@ -7,7 +7,6 @@ defmodule ElixirConfEU.Chat.Message do
     field :role, :string
 
     belongs_to :conversation, ElixirConfEU.Chat.Conversation
-    has_many :function_calls, ElixirConfEU.Chat.FunctionCall
 
     timestamps()
   end

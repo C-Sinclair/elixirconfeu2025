@@ -3,12 +3,13 @@ defmodule ElixirConfEU.Chat.FunctionCall do
   import Ecto.Changeset
 
   schema "function_calls" do
-    field :function_name, :string
+    field :module, :string
+    field :function, :string
     field :parameters, :map
     field :result, :string
     field :status, :string
 
-    belongs_to :message, ElixirConfEU.Chat.Message
+    belongs_to :conversation, ElixirConfEU.Chat.Conversation
 
     timestamps()
   end
@@ -18,9 +19,9 @@ defmodule ElixirConfEU.Chat.FunctionCall do
   """
   def changeset(function_call, attrs) do
     function_call
-    |> cast(attrs, [:function_name, :parameters, :result, :status, :message_id])
-    |> validate_required([:function_name, :parameters, :message_id])
+    |> cast(attrs, [:module, :function, :parameters, :result, :status, :conversation_id])
+    |> validate_required([:module, :function, :parameters, :conversation_id])
+    |> foreign_key_constraint(:conversation_id)
     |> validate_inclusion(:status, ["pending", "complete", "error"])
-    |> foreign_key_constraint(:message_id)
   end
 end

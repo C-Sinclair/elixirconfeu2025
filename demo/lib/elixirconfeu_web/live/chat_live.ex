@@ -2,9 +2,16 @@ defmodule ElixirConfEUWeb.ChatLive do
   use ElixirConfEUWeb, :live_view
 
   alias ElixirConfEU.Chat
+  alias Phoenix.PubSub
+  alias Task
 
   @impl true
   def mount(_params, _session, socket) do
+    # Subscribe to LLM responses when the LiveView mounts
+    if connected?(socket) do
+      PubSub.subscribe(ElixirConfEU.PubSub, "llm:responses")
+    end
+
     {:ok,
      socket
      |> assign(:current_conversation, nil)
@@ -41,15 +48,17 @@ defmodule ElixirConfEUWeb.ChatLive do
 
     messages = Chat.list_messages(conversation.id)
 
-    # TODO: Call the LLM here
+    # Call the LLM module asynchronously using Task
+    Task.async(fn ->
+      Elixirconfeu.LLM.chat(conversation.id, user_input)
+    end)
 
     {:noreply,
      socket
      |> assign(:current_conversation, conversation)
      |> assign(:messages, messages)
      |> assign(:user_input, "")
-     |> assign(:loading, true)
-     |> push_event("simulate_llm_response", %{message_id: message.id})}
+     |> assign(:loading, true)}
   end
 
   @impl true
@@ -67,32 +76,35 @@ defmodule ElixirConfEUWeb.ChatLive do
   end
 
   @impl true
-  def handle_event("simulate_llm_response", %{"message_id" => message_id}, socket) do
-    # This is just a simulation - in a real app, you'd receive a response from your LLM service
+  def handle_info({:llm_response, conversation_id, response}, socket) do
+    if socket.assigns.current_conversation &&
+         socket.assigns.current_conversation.id == conversation_id do
+      messages = Chat.list_messages(conversation_id)
 
-    {:ok, assistant_message} =
-      Chat.create_message(%{
-        content: "This is a simulated response from the assistant.",
-        role: "assistant",
-        conversation_id: socket.assigns.current_conversation.id
-      })
+      {:noreply,
+       socket
+       |> assign(:messages, messages)
+       |> assign(:loading, false)}
+    else
+      {:noreply, socket}
+    end
+  end
 
-    # Simulate a function call
-    {:ok, _function_call} =
-      Chat.create_function_call(%{
-        function_name: "example_function",
-        parameters: %{param1: "value1", param2: "value2"},
-        result: "Function result example",
-        status: "complete",
-        message_id: assistant_message.id
-      })
+  # Handle Task completion - although we don't need the result since we use PubSub
+  @impl true
+  def handle_info({ref, _result}, socket) when is_reference(ref) do
+    # The task completed successfully so we can demonitor it
+    Process.demonitor(ref, [:flush])
+    {:noreply, socket}
+  end
 
-    messages = Chat.list_messages(socket.assigns.current_conversation.id)
-
-    {:noreply,
-     socket
-     |> assign(:messages, messages)
-     |> assign(:loading, false)}
+  # Handle Task failure
+  @impl true
+  def handle_info({:DOWN, _ref, :process, _pid, reason}, socket) do
+    # The task failed
+    IO.puts("LLM task failed: #{inspect(reason)}")
+    # We could handle the failure here, e.g., by updating the UI
+    {:noreply, socket |> assign(:loading, false)}
   end
 
   defp create_default_conversation do
