@@ -2,6 +2,7 @@ defmodule ElixirConfEUWeb.ChatLive do
   use ElixirConfEUWeb, :live_view
 
   alias ElixirConfEU.Chat
+  alias ElixirConfEU.Chat.{Conversation, Message, FunctionCall}
   alias Phoenix.PubSub
   alias Task
 
@@ -15,7 +16,6 @@ defmodule ElixirConfEUWeb.ChatLive do
     {:ok,
      socket
      |> assign(:current_conversation, nil)
-     |> assign(:messages, [])
      |> assign(:user_input, "")
      |> assign(:loading, false)}
   end
@@ -23,12 +23,10 @@ defmodule ElixirConfEUWeb.ChatLive do
   @impl true
   def handle_params(%{"id" => id}, _uri, socket) do
     conversation = Chat.get_conversation!(id)
-    messages = Chat.list_messages(conversation.id)
 
     {:noreply,
      socket
-     |> assign(:current_conversation, conversation)
-     |> assign(:messages, messages)}
+     |> assign(:current_conversation, conversation)}
   end
 
   def handle_params(_params, _uri, socket) do
@@ -46,17 +44,17 @@ defmodule ElixirConfEUWeb.ChatLive do
         conversation_id: conversation.id
       })
 
-    messages = Chat.list_messages(conversation.id)
-
     # Call the LLM module asynchronously using Task
     Task.async(fn ->
-      Elixirconfeu.LLM.chat(conversation.id, user_input)
+      ElixirConfEU.LLM.chat(conversation.id, user_input)
     end)
+
+    messages = conversation.messages ++ [message]
+    conversation = %Conversation{conversation | messages: messages}
 
     {:noreply,
      socket
      |> assign(:current_conversation, conversation)
-     |> assign(:messages, messages)
      |> assign(:user_input, "")
      |> assign(:loading, true)}
   end
@@ -76,14 +74,14 @@ defmodule ElixirConfEUWeb.ChatLive do
   end
 
   @impl true
-  def handle_info({:llm_response, conversation_id, response}, socket) do
+  def handle_info({:llm_response, conversation_id, _response}, socket) do
     if socket.assigns.current_conversation &&
          socket.assigns.current_conversation.id == conversation_id do
-      messages = Chat.list_messages(conversation_id)
+      conversation = Chat.get_conversation!(conversation_id)
 
       {:noreply,
        socket
-       |> assign(:messages, messages)
+       |> assign(:current_conversation, conversation)
        |> assign(:loading, false)}
     else
       {:noreply, socket}
@@ -110,5 +108,39 @@ defmodule ElixirConfEUWeb.ChatLive do
   defp create_default_conversation do
     {:ok, conversation} = Chat.create_conversation(%{title: "New Conversation"})
     conversation
+  end
+
+  defp ordered_items(conversation) do
+    conversation.messages
+    |> Enum.concat(conversation.function_calls)
+    |> Enum.sort_by(& &1.inserted_at, :asc)
+  end
+
+  defp chat_item(%{item: %Message{}} = assigns) do
+    ~H"""
+    <div class="py-4 max-w-3xl">
+      <div class={if @item.role == "user", do: "text-4xl", else: ""}>
+        {@item.content}
+      </div>
+    </div>
+    """
+  end
+
+  defp chat_item(%{item: %FunctionCall{}} = assigns) do
+    ~H"""
+    <div class="flex flex-col gap-2 py-2 rounded-md text-sm">
+      <div class="font-mono text-blue-400">
+        {@item.module}.{@item.function}/1
+      </div>
+      <div class="">
+        <div class="font-semibold text-xs">Parameters:</div>
+        <pre class="text-xs p-1 rounded"><%= Jason.encode!(@item.parameters, pretty: true) %></pre>
+      </div>
+      <div :if={@item.result} class="">
+        <div class="font-semibold text-xs">Result:</div>
+        <pre class="text-xs p-1 rounded"><%= @item.result %></pre>
+      </div>
+    </div>
+    """
   end
 end

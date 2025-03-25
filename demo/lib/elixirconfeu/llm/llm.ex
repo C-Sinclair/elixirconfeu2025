@@ -1,4 +1,4 @@
-defmodule Elixirconfeu.LLM do
+defmodule ElixirConfEU.LLM do
   @moduledoc """
   This module provides a simple interface for interacting with the LLM using Langchain.
   """
