@@ -59,7 +59,8 @@ defmodule ElixirConfEU.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:cors_plug, "~> 3.0"},
-      {:langchain, "0.3.2"}
+      {:langchain, "0.3.2"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
