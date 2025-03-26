@@ -8,12 +8,7 @@ defmodule ElixirConfEU.LLM.Function do
   @spec new!(atom(), atom(), String.t(), map() | nil) :: LangChain.Function.t()
   @spec new!(atom(), atom(), String.t()) :: LangChain.Function.t()
   def new!(module, function, description, parameters_schema \\ nil) do
-    name =
-      module
-      |> Module.split()
-      |> Enum.join("_")
-      |> Kernel.<>("_#{function}")
-      |> String.downcase()
+    name = get_name(module, function)
 
     LangChain.Function.new!(%{
       name: name,
@@ -44,6 +39,19 @@ defmodule ElixirConfEU.LLM.Function do
         result
       end
     })
+  end
+
+  def get_name(module, function) when is_atom(module) do
+    module
+    |> Module.split()
+    |> Enum.join("_")
+    |> get_name(function)
+  end
+
+  def get_name(module, function) when is_binary(module) do
+    module
+    |> Kernel.<>("_#{function}")
+    |> String.downcase()
   end
 
   defp notify_liveview(conversation_id) do
