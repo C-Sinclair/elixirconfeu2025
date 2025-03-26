@@ -1,3 +1,14 @@
+# `whoami`
+
+```bash
+history
+```
+
+- No CompSci background
+
+Note: This is important
+
+---
 
 # `whoami`
 
@@ -5,11 +16,62 @@
 history
 ```
 
-```js [1-2|3|4]
-let a = 1;
-let b = 2;
-let c = x => 1 + 2 + x;
-c(3);
+- No CompSci background
+- Self taught Javascript canvas ninja
+
+---
+
+# `whoami`
+
+```bash
+history
 ```
 
 - No CompSci background
+- Self taught Javascript canvas ninja
+- PHP agency work 💜 jQuery 
+
+---
+
+# `whoami`
+
+```bash
+history
+```
+
+- No CompSci background
+- Self taught Javascript canvas ninja
+- PHP agency work 💜 jQuery 
+- React embedded in C++ desktop application
+
+---
+
+# `whoami`
+
+```bash
+history
+```
+
+- No CompSci background
+- Self taught Javascript canvas ninja
+- PHP agency work 💜 jQuery 
+- React embedded in C++ desktop application
+- Next.JS (~ v12) 
+
+---
+
+# `whoami`
+
+```bash
+history
+```
+
+- No CompSci background
+- Self taught Javascript canvas ninja
+- PHP agency work 💜 jQuery 
+- React embedded in C++ desktop application
+- Next.JS (~ v12) 
+- Elixir, Liveview, React at an EdTech unicorn 
+
+
+

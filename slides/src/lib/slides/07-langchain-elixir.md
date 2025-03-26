@@ -1,11 +1,6 @@
 
 # Langchain for Elixir
 
-- Introduction to Langchain
-- Why Elixir implementation matters
-- Key features
-- Comparison with other implementations
-
 ---
 
 # Defining a custom function
@@ -50,7 +45,7 @@ custom_fn =
 # create and run the chain
 {:ok, updated_chain} =
   LLMChain.new!(%{
-    llm: ChatOpenAI.new!(),
+    llm: llm(),
     custom_context: custom_context,
     verbose: true
   })

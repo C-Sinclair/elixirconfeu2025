@@ -1,9 +1,21 @@
+# Doc Comments 
 
+`@doc` is just another module attribute. Which means it exists at compile time, and we can therefore access it at runtime! 
 
-# Doc Comments and Macros
-
-- How doc comments work in Elixir
-- Module attributes
-- Accessing documentation at compile time
-- @doc, @moduledoc, and custom attributes
+```elixir [14|1|3|4|5|7-13]
+{:docs_v1, 
+ _,
+ :elixir, 
+ "text/markdown", 
+ %{"en" => @moduledoc}, 
+ _, 
+ [{
+    {:function, :foo, _arity}, 
+    _, 
+    _, 
+    %{"en" => @doc}, 
+    _
+  }]
+} = Code.fetch_docs(module)
+```
 
