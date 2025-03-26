@@ -82,6 +82,10 @@ defmodule ElixirConfEUWeb.ChatLive do
     end
   end
 
+  def handle_info({:llm_response, conversation_id}, socket) do
+    handle_info({:llm_response, conversation_id, nil}, socket)
+  end
+
   # Handle Task completion - although we don't need the result since we use PubSub
   @impl true
   def handle_info({ref, _result}, socket) when is_reference(ref) do

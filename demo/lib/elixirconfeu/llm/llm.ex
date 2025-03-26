@@ -4,34 +4,64 @@ defmodule ElixirConfEU.LLM do
   """
   alias ElixirConfEU.Chat
   alias Phoenix.PubSub
+  alias LangChain.Chains.LLMChain
+  alias LangChain.ChatModels.ChatAnthropic
+  alias LangChain.{Function, Message}
 
-  def chat(conversation_id, _user_input) do
-    # Process the chat with the LLM (implementation details)
-    # This is where you would use Langchain to get a response
+  def chat(conversation_id, user_input) do
+    custom_fn =
+      Function.new!(%{
+        name: "custom",
+        description: "Returns the location of the requested element or item.",
+        parameters_schema: %{
+          type: "object",
+          properties: %{
+            thing: %{
+              type: "string",
+              description: "The thing whose location is being requested."
+            }
+          },
+          required: ["thing"]
+        },
+        function: fn arguments, _context ->
+          # Create a function call at the conversation level
+          {:ok, _function_call} =
+            Chat.create_function_call(%{
+              module: "ElixirConfEU.Greeter",
+              function: "welcome",
+              parameters: arguments,
+              result: "Welcome to ElixirConf EU 2025! We're excited to have you here.",
+              status: "complete",
+              conversation_id: conversation_id
+            })
 
-    # For the demo, simulate a response
-    # Simulate processing time
-    Process.sleep(1000)
+          # broadcast the function call to the client
+          PubSub.broadcast(
+            ElixirConfEU.PubSub,
+            "llm:responses",
+            {:llm_response, conversation_id}
+          )
+
+          # our context is a pretend item/location location map
+          {:ok, "Welcome to ElixirConf EU 2025! We're excited to have you here."}
+        end
+      })
+
+    # create and run the chain
+    {:ok, %LLMChain{} = chain} =
+      LLMChain.new!(%{
+        llm: ChatAnthropic.new!(%{model: "claude-3-5-sonnet-20240620"}),
+        verbose: true
+      })
+      |> LLMChain.add_tools(custom_fn)
+      |> LLMChain.add_message(Message.new_user!(user_input))
+      |> LLMChain.run(mode: :while_needs_response)
 
     # Create the assistant message in the database
     {:ok, assistant_message} =
       Chat.create_message(%{
-        content: "This is a response from the LLM module via PubSub.",
+        content: chain.last_message.content,
         role: "assistant",
-        conversation_id: conversation_id
-      })
-
-    # Create a function call at the conversation level
-    {:ok, _function_call} =
-      Chat.create_function_call(%{
-        module: "ElixirConfEU.Greeter",
-        function: "welcome",
-        parameters: %{
-          "name" => "ElixirConf EU",
-          "year" => 2025
-        },
-        result: "Welcome to ElixirConf EU 2025! We're excited to have you here.",
-        status: "complete",
         conversation_id: conversation_id
       })
 
