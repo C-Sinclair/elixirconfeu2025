@@ -93,7 +93,13 @@ defmodule ElixirConfEU.Chat do
   """
   def create_function_call(attrs \\ %{}) do
     %FunctionCall{}
-    |> FunctionCall.changeset(attrs)
+    |> FunctionCall.changeset(%{
+      status: "pending",
+      module: to_string(Map.get(attrs, :module)),
+      function: to_string(Map.get(attrs, :function)),
+      parameters: Map.get(attrs, :parameters),
+      conversation_id: Map.get(attrs, :conversation_id)
+    })
     |> Repo.insert()
   end
 
@@ -110,9 +116,12 @@ defmodule ElixirConfEU.Chat do
   @doc """
   Updates a function call.
   """
-  def update_function_call(%FunctionCall{} = function_call, attrs) do
+  def complete_function_call(%FunctionCall{} = function_call, result) do
     function_call
-    |> FunctionCall.changeset(attrs)
+    |> FunctionCall.changeset(%{
+      status: "complete",
+      result: result
+    })
     |> Repo.update()
   end
 end

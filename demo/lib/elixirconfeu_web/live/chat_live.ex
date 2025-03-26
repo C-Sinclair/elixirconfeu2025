@@ -68,7 +68,7 @@ defmodule ElixirConfEUWeb.ChatLive do
   end
 
   @impl true
-  def handle_info({:llm_response, conversation_id, _response}, socket) do
+  def handle_info({:llm_response, conversation_id}, socket) do
     if socket.assigns.current_conversation &&
          socket.assigns.current_conversation.id == conversation_id do
       conversation = Chat.get_conversation!(conversation_id)
@@ -80,10 +80,6 @@ defmodule ElixirConfEUWeb.ChatLive do
     else
       {:noreply, socket}
     end
-  end
-
-  def handle_info({:llm_response, conversation_id}, socket) do
-    handle_info({:llm_response, conversation_id, nil}, socket)
   end
 
   # Handle Task completion - although we don't need the result since we use PubSub
