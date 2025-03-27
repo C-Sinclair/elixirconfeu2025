@@ -5,15 +5,15 @@ defmodule ElixirConfEU.LLM.Function do
   alias ElixirConfEU.Chat
   alias Phoenix.PubSub
 
-  @spec new!(atom(), atom(), String.t(), map() | nil) :: LangChain.Function.t()
+  @spec new!(atom(), atom(), String.t(), Keyword.t() | nil) :: LangChain.Function.t()
   @spec new!(atom(), atom(), String.t()) :: LangChain.Function.t()
-  def new!(module, function, description, parameters_schema \\ nil) do
+  def new!(module, function, description, params \\ nil) do
     name = get_name(module, function)
 
     LangChain.Function.new!(%{
       name: name,
       description: description,
-      parameters_schema: parameters_schema,
+      params: params,
       function: fn arguments, %{conversation_id: conversation_id} = context ->
         # Create a function call record
         {:ok, function_call} =
