@@ -20,7 +20,7 @@ defmodule ElixirConfEU.Chat.FunctionCall do
   def changeset(function_call, attrs) do
     function_call
     |> cast(attrs, [:module, :function, :parameters, :result, :status, :conversation_id])
-    |> validate_required([:module, :function, :parameters, :conversation_id])
+    |> validate_required([:module, :function, :conversation_id])
     |> foreign_key_constraint(:conversation_id)
     |> validate_inclusion(:status, ["pending", "complete", "error"])
   end

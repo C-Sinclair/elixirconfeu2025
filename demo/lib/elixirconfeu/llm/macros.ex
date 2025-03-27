@@ -4,26 +4,19 @@ defmodule ElixirConfEU.LLM.Macros do
   """
   alias ElixirConfEU.LLM.Function
 
-  @functions []
-
   defmacro __using__(_opts) do
     quote do
-      @after_compile unquote(__MODULE__)
+      # magic function which is looked for by the LLM to determine if a module is LLM enabled
+      def __magic_is_real__ do
+        true
+      end
     end
   end
 
-  defmacro __after_compile__(env, _bytecode) do
-    module = env.module
-    IO.inspect(module)
-
-    Module.get_attribute(module, :doc)
-    |> IO.inspect()
-
+  def module_functions(module) do
     {:docs_v1, _, _, _, _, _, function_docs} = Code.fetch_docs(module)
 
-    functions = docs_to_funs(function_docs, module)
-
-    Module.put_attribute(__MODULE__, :functions, functions)
+    docs_to_funs(function_docs, module)
   end
 
   defp docs_to_funs(docs, module) do
@@ -42,5 +35,20 @@ defmodule ElixirConfEU.LLM.Macros do
     end)
   end
 
-  def get_functions, do: @functions
+  def ensure_modules_loaded do
+    Application.spec(:elixirconfeu, :modules)
+    |> Enum.each(&Code.ensure_loaded/1)
+  end
+
+  def get_functions do
+    ensure_modules_loaded()
+
+    :code.all_loaded()
+    |> Enum.filter(fn {module, _} ->
+      Kernel.function_exported?(module, :__magic_is_real__, 0)
+    end)
+    |> Enum.map(fn {module, _path} -> module end)
+    |> Enum.map(&module_functions/1)
+    |> List.flatten()
+  end
 end

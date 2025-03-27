@@ -75,9 +75,13 @@ defmodule ElixirConfEU.LLM do
   end
 
   defp add_macro_functions(chain) do
+    tools =
+      ElixirConfEU.LLM.Macros.get_functions()
+      |> IO.inspect()
+
     LLMChain.add_tools(
       chain,
-      ElixirConfEU.LLM.Macros.get_functions()
+      tools
     )
   end
 end
