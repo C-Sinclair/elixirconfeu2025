@@ -1,7 +1,7 @@
 <script>
 </script>
 
-<article>
+<article data-id="me-card">
 	<div class="me-card">
 		<img src="/me.jpeg" alt="Me" class="avatar" />
 		<div>
@@ -10,13 +10,17 @@
 				<span class="title">Senior Software Engineer</span> @
 				<span class="company">Multiverse</span>
 			</p>
+			<footer>
+				<a href="https://github.com/C-Sinclair" target="_blank" rel="noopener noreferrer">
+					<img src="/img/github.svg" alt="GitHub" />
+					csinclair
+				</a>
+				<a href="https://x.com/_csinclair_" target="_blank" rel="noopener noreferrer">
+					<img src="/img/x.svg" alt="X icon" />
+					@_csinclair_
+				</a>
+			</footer>
 		</div>
-		<footer>
-			<a href="https://github.com/C-Sinclair" target="_blank" rel="noopener noreferrer"> GitHub </a>
-			<a href="https://twitter.com/_csinclair_" target="_blank" rel="noopener noreferrer">
-				Twitter
-			</a>
-		</footer>
 	</div>
 </article>
 
@@ -53,14 +57,6 @@
 		align-self: center;
 	}
 
-	footer {
-		margin-top: 1rem;
-		display: flex;
-		justify-content: space-around;
-		width: 100%;
-		grid-column: 1 / 3;
-	}
-
 	.name {
 		font-size: var(--font-size-5);
 		font-weight: 600;
@@ -69,5 +65,23 @@
 	:is(.title, .company) {
 		font-size: var(--font-size-4);
 		font-weight: 400;
+	}
+
+	footer {
+		display: flex;
+		justify-content: space-around;
+		width: 100%;
+		font-size: var(--font-size-0);
+	}
+
+	footer a {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	footer a img {
+		width: 1rem;
+		height: 1rem;
 	}
 </style>

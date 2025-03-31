@@ -21,7 +21,8 @@
 			autoAnimateEasing: 'ease',
 			autoAnimateDuration: 1,
 			hash: true,
-			controls: false
+			controls: false,
+			center: false
 
 			// progress: false
 		});

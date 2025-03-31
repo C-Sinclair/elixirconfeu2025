@@ -1,8 +1,7 @@
 <script>
-	export let slides;
+	import Title from '$lib/slides/01-title.svelte';
+	import Whoami from '$lib/slides/02-whoami.svelte';
 </script>
 
-{#each slides as slide}
-	<!-- Reminder: using paths means we get the nice code morphing stuff from Reveal.js -->
-	<section data-auto-animate data-markdown={slide.path} data-separator="^\r?\n---\r?\n$"></section>
-{/each}
+<Title />
+<Whoami />
