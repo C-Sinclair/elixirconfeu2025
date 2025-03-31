@@ -12,8 +12,6 @@
 
 	import Presentation from './presentation.svelte';
 
-	export let slides;
-
 	onMount(() => {
 		const deck = new Reveal({
 			plugins: [Markdown, Highlight, Notes],
@@ -33,6 +31,6 @@
 
 <div class="reveal">
 	<div class="slides">
-		<Presentation {slides} />
+		<Presentation />
 	</div>
 </div>

@@ -1,18 +1,23 @@
+<script>
+	import SlideTitle from '$lib/components/SlideTitle.svelte';
+	import Code from '$lib/deck/code.svelte';
+</script>
 
-# Langchain for Elixir
+<section data-auto-animate>
+	<SlideTitle>Langchain for Elixir</SlideTitle>
+</section>
 
----
+<section data-auto-animate>
+	<SlideTitle>Defining a custom function</SlideTitle>
 
-# Defining a custom function
-
-```elixir
-alias LangChain.Function
+	<Code
+		>{@html `alias LangChain.Function
 alias LangChain.Message
 alias LangChain.Chains.LLMChain
 alias LangChain.ChatModels.ChatOpenAI
 alias LangChain.Utils.ChainResult
 
-# map of data we want to be passed as `context` to the function when
+# map of data we want to be passed as \`context\` to the function when
 # executed.
 custom_context = %{
   "user_id" => 123,
@@ -56,7 +61,8 @@ custom_fn =
 # print the LLM's answer
 IO.puts(ChainResult.to_string!(updated_chain))
 # => "The hairbrush is located in the drawer."
-```
+`}</Code
+	>
 
-Reference: [Langchain docs](https://hexdocs.pm/langchain/readme.html)
-
+	<p>Reference: <a href="https://hexdocs.pm/langchain/readme.html">Langchain docs</a></p>
+</section>

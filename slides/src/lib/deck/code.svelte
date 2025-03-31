@@ -3,7 +3,11 @@
 </script>
 
 <pre data-id={id || null}>
-	<code data-trim data-line-numbers={lines || null} data-noescape={noescape || null}>
+	<code
+		data-trim
+		data-line-numbers={lines || null}
+		data-noescape={noescape || null}
+		class="hljs language-elixir">
 		{@render children()}
 	</code>
 </pre>

@@ -69,7 +69,7 @@
 
 	footer {
 		display: flex;
-		justify-content: space-around;
+		gap: 2rem;
 		width: 100%;
 		font-size: var(--font-size-0);
 	}
