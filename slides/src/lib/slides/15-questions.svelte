@@ -10,8 +10,8 @@
 	<p>Contact:</p>
 
 	<ul>
-		<li>Email: your.email@example.com</li>
-		<li>GitHub: @yourusername</li>
-		<li>Twitter: @yourtwitterhandle</li>
+		<li>Email: conor@sinclair.software</li>
+		<li>GitHub: @csinclair</li>
+		<li>Twitter: @_csinclair_</li>
 	</ul>
 </section>

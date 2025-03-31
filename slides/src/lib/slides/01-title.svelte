@@ -8,7 +8,7 @@
 
 	<p>Dynamic Function Calling with LLMs</p>
 
-	<MeCard />
-
 	<p>May 2025</p>
+
+	<MeCard />
 </section>

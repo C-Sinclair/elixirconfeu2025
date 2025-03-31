@@ -63,7 +63,7 @@
 	}
 
 	:is(.title, .company) {
-		font-size: var(--font-size-4);
+		font-size: var(--font-size-2);
 		font-weight: 400;
 	}
 
