@@ -6,14 +6,16 @@
 <section data-auto-animate>
 	<SlideTitle>Module Attributes</SlideTitle>
 
-	<p>`@tag` in ExUnit is just a plain old module attribute</p>
+	<p><code>@tag</code> in ExUnit is just a plain old module attribute</p>
 
 	<Code
-		>{`@tag :my_tag
+		code={`
+@tag :my_tag
 test "a test which does a thing" do
     ...
-end`}</Code
-	>
+end
+`}
+	/>
 </section>
 
 <section data-auto-animate>
@@ -22,13 +24,14 @@ end`}</Code
 	<p>`@tag` in ExUnit is just a plain old module attribute</p>
 
 	<Code
-		>{`@tag :my_tag
+		code={`
+@tag :my_tag
 test "a test which does a thing" do
     ...
-end`}</Code
-	>
+end`}
+	/>
 
 	<p>Hottip 🔥</p>
 
-	<Code>{`mix test --only my_tag`}</Code>
+	<Code code={`mix test --only my_tag`} lang="bash" />
 </section>

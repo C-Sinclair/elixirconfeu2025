@@ -11,7 +11,8 @@
 	<SlideTitle>Defining a custom function</SlideTitle>
 
 	<Code
-		>{@html `alias LangChain.Function
+		code={`
+alias LangChain.Function
 alias LangChain.Message
 alias LangChain.Chains.LLMChain
 alias LangChain.ChatModels.ChatOpenAI
@@ -61,8 +62,8 @@ custom_fn =
 # print the LLM's answer
 IO.puts(ChainResult.to_string!(updated_chain))
 # => "The hairbrush is located in the drawer."
-`}</Code
-	>
+`}
+	/>
 
 	<p>Reference: <a href="https://hexdocs.pm/langchain/readme.html">Langchain docs</a></p>
 </section>

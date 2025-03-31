@@ -7,12 +7,32 @@
 	<SlideTitle>Doc Comments</SlideTitle>
 
 	<p>
-		`@doc` is just another module attribute. Which means it exists at compile time, and we can
-		therefore access it at runtime!
+		<code>@doc</code> is just another module attribute. Which means it exists at compile time, and we
+		can therefore access it at runtime!
 	</p>
 
-	<Code lines="14|1|3|4|5|7-13"
-		>{@html `{:docs_v1, 
+	<Code
+		id="fetch-docs"
+		lines="2"
+		code={`
+{:docs_v1, ...}
+= Code.fetch_docs(module)`}
+	/>
+</section>
+
+<section data-auto-animate>
+	<SlideTitle>Doc Comments</SlideTitle>
+
+	<p>
+		<code>@doc</code> is just another module attribute. Which means it exists at compile time, and we
+		can therefore access it at runtime!
+	</p>
+
+	<Code
+		id="fetch-docs"
+		lines="14|1|3|4|5|7-13"
+		code={`
+{:docs_v1, 
  _,
  :elixir, 
  "text/markdown", 
@@ -25,6 +45,6 @@
     %{"en" => @doc}, 
     _
   }]
-} = Code.fetch_docs(module)`}</Code
-	>
+} = Code.fetch_docs(module)`}
+	/>
 </section>
