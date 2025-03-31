@@ -32,7 +32,7 @@ defmodule ElixirConfEU.LLM.Function do
 
         # Update the function call with the result
         {:ok, _function_call} =
-          Chat.complete_function_call(function_call, result)
+          Chat.complete_function_call(function_call, "#{inspect(result)}")
 
         notify_liveview(conversation_id)
 

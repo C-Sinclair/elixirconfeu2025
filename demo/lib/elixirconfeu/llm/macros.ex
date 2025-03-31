@@ -39,14 +39,19 @@ defmodule ElixirConfEU.LLM.Macros do
   end
 
   defp parse_doc(doc) when is_binary(doc) do
-    doc
-    |> String.split("### Parameters")
-    |> parse_doc()
-  end
+    case String.split(doc, "### Parameters") do
+      [_, params] ->
+        params =
+          params
+          |> String.split("### Returns")
+          |> List.first()
 
-  # case when no params provided
-  defp parse_doc([doc]) do
-    [doc, nil]
+        [doc, params]
+        |> parse_doc()
+
+      _ ->
+        [doc, nil]
+    end
   end
 
   defp parse_doc([doc, params]) do
