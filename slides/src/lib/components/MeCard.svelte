@@ -1,9 +1,6 @@
-<script>
-</script>
-
 <article data-id="me-card">
 	<div class="me-card">
-		<img src="/me.jpeg" alt="Me" class="avatar" />
+		<img src="/me.jpeg" alt="Me" class="avatar" data-id="me-avatar" />
 		<div>
 			<p class="name">Conor Sinclair</p>
 			<p>
@@ -35,8 +32,8 @@
 	p {
 		text-align: left;
 		padding: 0;
-		margin: 0.25em 0;
-		grid-column: 2;
+		margin: 0;
+		line-height: 1;
 	}
 
 	.me-card {
@@ -45,12 +42,10 @@
 		gap: 1rem;
 	}
 
-	.avatar {
-		height: 8rem;
-		width: 8rem;
-		max-width: 8rem;
-		max-height: 8rem;
-		border-radius: 9999px;
+	.me-card > div {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3em;
 	}
 
 	.me-card > div {
@@ -58,12 +53,12 @@
 	}
 
 	.name {
-		font-size: var(--font-size-5);
+		font-size: var(--font-size-4);
 		font-weight: 600;
 	}
 
-	:is(.title, .company) {
-		font-size: var(--font-size-2);
+	p:has(.title, .company) {
+		font-size: var(--font-size-1);
 		font-weight: 400;
 	}
 
@@ -83,5 +78,6 @@
 	footer a img {
 		width: 1rem;
 		height: 1rem;
+		margin: 0;
 	}
 </style>

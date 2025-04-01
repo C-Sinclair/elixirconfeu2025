@@ -3,15 +3,25 @@
 </script>
 
 <section data-auto-animate>
-	<SlideTitle>Elixir's Macro System</SlideTitle>
+	<SlideTitle centred>And now for something completely different...</SlideTitle>
+</section>
 
-	<ul>
-		<li>What are macros?</li>
-		<li>AST representation</li>
-		<li>Compile-time vs runtime</li>
-		<li>Meta-programming capabilities</li>
-		<li>Example of simple macro</li>
-	</ul>
+<section data-auto-animate>
+	<SlideTitle>Elixir's Macro System</SlideTitle>
+</section>
+
+<section data-auto-animate>
+	<SlideTitle>What is a macro?</SlideTitle>
+
+	<p>You now know metaprogramming!</p>
+</section>
+
+<section data-auto-animate>
+	<SlideTitle>AST representation</SlideTitle>
+</section>
+
+<section data-auto-animate>
+	<SlideTitle>Simple example macro</SlideTitle>
 </section>
 
 <section data-auto-animate>

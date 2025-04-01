@@ -7,8 +7,8 @@
 	<SlideTitle>Doc Comments</SlideTitle>
 
 	<p>
-		<code>@doc</code> is just another module attribute. Which means it exists at compile time, and we
-		can therefore access it at runtime!
+		<code>@doc</code> is just another module attribute. A special compile time attribute that can be
+		accessed at runtime!
 	</p>
 
 	<Code
@@ -24,8 +24,8 @@
 	<SlideTitle>Doc Comments</SlideTitle>
 
 	<p>
-		<code>@doc</code> is just another module attribute. Which means it exists at compile time, and we
-		can therefore access it at runtime!
+		<code>@doc</code> is just another module attribute. A special compile time attribute that can be
+		accessed at runtime!
 	</p>
 
 	<Code

@@ -2,6 +2,7 @@ defmodule ElixirConfEU.LLM do
   @moduledoc """
   This module provides a simple interface for interacting with the LLM using Langchain.
   """
+  alias LangChain.PromptTemplate
   alias LangChain.Utils.ChainResult
   alias ElixirConfEU.Chat
   alias ElixirConfEU.Chat.{Conversation, FunctionCall, Message}
@@ -71,17 +72,36 @@ defmodule ElixirConfEU.LLM do
           })
       end)
 
-    LLMChain.add_messages(chain, convo_items)
+    chain
+    |> LLMChain.add_message(system_message())
+    |> LLMChain.add_messages(convo_items)
   end
 
   defp add_macro_functions(chain) do
-    tools =
-      ElixirConfEU.LLM.Macros.get_functions()
-      |> IO.inspect()
-
     LLMChain.add_tools(
       chain,
-      tools
+      ElixirConfEU.LLM.Macros.get_functions()
     )
+  end
+
+  @introduction PromptTemplate.from_template!(~s(
+    You are a helpful assistant that can help with a variety of tasks.
+    ))
+
+  @system_prompt_template PromptTemplate.from_template!(~s(
+    <%= @introduction %>
+    ))
+
+  defp system_message do
+    variables = %{}
+
+    PromptTemplate.format_composed(
+      @system_prompt_template,
+      %{
+        introduction: @introduction
+      },
+      variables
+    )
+    |> LangChain.Message.new_system!()
   end
 end

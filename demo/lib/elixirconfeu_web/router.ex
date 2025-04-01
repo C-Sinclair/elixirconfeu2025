@@ -37,6 +37,9 @@ defmodule ElixirConfEUWeb.Router do
     pipe_through :iframe
 
     get "/", PageController, :iframe
+
+    live "/chat", ChatLive, :index
+    live "/chat/:id", ChatLive, :show
   end
 
   # Other scopes may use custom stacks.

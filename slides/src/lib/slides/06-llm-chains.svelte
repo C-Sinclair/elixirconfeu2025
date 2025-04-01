@@ -5,18 +5,5 @@
 <section data-auto-animate>
 	<SlideTitle>LLM Chains</SlideTitle>
 
-	<ul>
-		<li>Concept of LLM chains</li>
-		<li>API structure</li>
-		<li>
-			Chain components
-			<ul>
-				<li>Prompts</li>
-				<li>Models</li>
-				<li>Memory</li>
-				<li>Tools</li>
-			</ul>
-		</li>
-		<li>Chain composition patterns</li>
-	</ul>
+	<p>Image here of chain of messages shown as a stream of tokens</p>
 </section>
