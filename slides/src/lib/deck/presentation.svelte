@@ -8,9 +8,9 @@
 	import LangchainElixir from '$lib/slides/07-langchain-elixir.svelte';
 	import LangchainDataStructures from '$lib/slides/08-langchain-data-structures.svelte';
 	import ElixirMacros from '$lib/slides/09-elixir-macros.svelte';
-	import DocComments from '$lib/slides/11-doc-comments.svelte';
-	import ExUnitTag from '$lib/slides/10-exunit-tag.svelte';
-	import ExtractingDocComments from '$lib/slides/12-our-using-macro.svelte';
+	import DocComments from '$lib/slides/10-doc-comments.svelte';
+	import OurUsingMacro from '$lib/slides/11-our-using-macro.svelte';
+	import OurModules from '$lib/slides/12-our-modules.svelte';
 	import ExampleApplication from '$lib/slides/13-example-application.svelte';
 	import References from '$lib/slides/14-references.svelte';
 	import Questions from '$lib/slides/15-questions.svelte';
@@ -26,8 +26,8 @@
 <LangchainDataStructures />
 <ElixirMacros />
 <DocComments />
-<ExUnitTag />
-<ExtractingDocComments />
+<OurUsingMacro />
+<OurModules />
 <ExampleApplication />
 <References />
 <Questions />
