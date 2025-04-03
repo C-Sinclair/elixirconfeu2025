@@ -8,13 +8,11 @@
 </section>
 
 <section data-auto-animate>
-	<SlideTitle>Elixir's Macro System</SlideTitle>
-</section>
-
-<section data-auto-animate>
 	<SlideTitle>What is a macro?</SlideTitle>
 
-	<p>You now know metaprogramming!</p>
+	<p>
+		Macros let you write code that writes code—transforming Elixir at compile time using its AST.
+	</p>
 </section>
 
 <section data-auto-animate>
@@ -23,6 +21,12 @@
 
 <section data-auto-animate>
 	<SlideTitle>Simple example macro</SlideTitle>
+	<p>You now know metaprogramming!</p>
+</section>
+
+<section data-auto-animate>
+	<SlideTitle>Macros</SlideTitle>
+	<p>You now know metaprogramming!</p>
 </section>
 
 <section data-auto-animate>
