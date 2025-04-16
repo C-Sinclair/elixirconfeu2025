@@ -11,7 +11,8 @@
 }
 
 /* This file is for your main application CSS */
-body {
+body,
+::backdrop {
   background-color: var(--background-color);
   color: var(--text-color);
 }
