@@ -2,6 +2,9 @@ defmodule ElixirConfEU.LLM do
   @moduledoc """
   This module provides a simple interface for interacting with the LLM using Langchain.
   """
+
+  require Logger
+
   alias LangChain.PromptTemplate
   alias LangChain.Utils.ChainResult
   alias ElixirConfEU.Chat
@@ -12,6 +15,8 @@ defmodule ElixirConfEU.LLM do
   alias ElixirConfEU.LLM.Function
 
   def chat(conversation_id, user_input) do
+    Logger.info("[Chat #{conversation_id}] User input: #{user_input}")
+
     {:ok, %LLMChain{} = chain} =
       LLMChain.new!(%{
         llm: claude(),

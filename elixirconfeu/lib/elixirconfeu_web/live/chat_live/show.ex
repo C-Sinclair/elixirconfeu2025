@@ -2,6 +2,83 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
   use ElixirConfEUWeb, :live_view
 
   alias ElixirConfEU.Chat
+  alias ElixirConfEU.Chat.{Conversation, FunctionCall, Message}
+  alias Phoenix.PubSub
+
+  @impl true
+  def mount(%{"id" => id}, _session, socket) do
+    # Subscribe to LLM responses when the LiveView mounts
+    if connected?(socket) do
+      PubSub.subscribe(ElixirConfEU.PubSub, "llm:responses")
+    end
+
+    {:ok,
+     socket
+     |> assign(:page_title, "Show Conversation")
+     |> assign(:user_input, "")
+     |> assign(:loading, false)
+     |> assign(:conversation, Chat.get_conversation!(id))}
+  end
+
+  @impl true
+  def handle_event(
+        "submit_message",
+        %{"user_input" => user_input},
+        %{assigns: %{conversation: conversation}} = socket
+      ) do
+    {:ok, message} =
+      Chat.create_message(%{
+        content: user_input,
+        role: "user",
+        conversation_id: conversation.id
+      })
+
+    # Start an independent supervised task that will survive navigation
+    Task.Supervisor.async_nolink(ElixirConfEU.TaskSupervisor, fn ->
+      ElixirConfEU.LLM.chat(conversation.id, user_input)
+    end)
+
+    messages = conversation.messages ++ [message]
+    conversation = %Conversation{conversation | messages: messages}
+
+    {:noreply,
+     socket
+     |> assign(:conversation, conversation)
+     |> assign(:user_input, "")
+     |> assign(:loading, true)}
+  end
+
+  @impl true
+  def handle_info({:llm_response, conversation_id}, socket) do
+    if socket.assigns.conversation &&
+         socket.assigns.conversation.id == conversation_id do
+      conversation = Chat.get_conversation!(conversation_id)
+
+      {:noreply,
+       socket
+       |> assign(:conversation, conversation)
+       |> assign(:loading, false)}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  # Handle Task completion - although we don't need the result since we use PubSub
+  @impl true
+  def handle_info({ref, _result}, socket) when is_reference(ref) do
+    # The task completed successfully so we can demonitor it
+    Process.demonitor(ref, [:flush])
+    {:noreply, socket}
+  end
+
+  # Handle Task failure from supervised task
+  @impl true
+  def handle_info({:DOWN, _ref, :process, _pid, reason}, socket) do
+    # The task failed
+    IO.puts("LLM task failed: #{inspect(reason)}")
+    # We could handle the failure here, e.g., by updating the UI
+    {:noreply, socket |> assign(:loading, false)}
+  end
 
   @impl true
   def render(assigns) do
@@ -9,7 +86,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
     <Layouts.app flash={@flash}>
       <div class="flex-1 p-4 overflow-y-auto">
         <div class="space-y-4">
-          <.chat_item :for={item <- ordered_items(@current_conversation)} item={item} />
+          <.chat_item :for={item <- ordered_items(@conversation)} item={item} />
         </div>
       </div>
 
@@ -38,80 +115,6 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
       </div>
     </Layouts.app>
     """
-  end
-
-  @impl true
-  def mount(%{"id" => id}, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:page_title, "Show Conversation")
-     |> assign(:conversation, Chat.get_conversation!(id))}
-  end
-
-  @impl true
-  def handle_event("submit_message", %{"user_input" => user_input}, socket) do
-    conversation = socket.assigns.current_conversation || create_default_conversation()
-
-    # If this is a new conversation, update the URL
-    socket =
-      if socket.assigns.current_conversation == nil do
-        push_patch(socket, to: ~p"/chat/#{conversation.id}")
-      else
-        socket
-      end
-
-    {:ok, message} =
-      Chat.create_message(%{
-        content: user_input,
-        role: "user",
-        conversation_id: conversation.id
-      })
-
-    # Call the LLM module asynchronously using Task
-    Task.async(fn ->
-      ElixirConfEU.LLM.chat(conversation.id, user_input)
-    end)
-
-    messages = conversation.messages ++ [message]
-    conversation = %Conversation{conversation | messages: messages}
-
-    {:noreply,
-     socket
-     |> assign(:current_conversation, conversation)
-     |> assign(:user_input, "")
-     |> assign(:loading, true)}
-  end
-
-  @impl true
-  def handle_info({:llm_response, conversation_id}, socket) do
-    if socket.assigns.current_conversation &&
-         socket.assigns.current_conversation.id == conversation_id do
-      conversation = Chat.get_conversation!(conversation_id)
-
-      {:noreply,
-       socket
-       |> assign(:current_conversation, conversation)
-       |> assign(:loading, false)}
-    else
-      {:noreply, socket}
-    end
-  end
-
-  # Handle Task completion - although we don't need the result since we use PubSub
-  @impl true
-  def handle_info({ref, _result}, socket) when is_reference(ref) do
-    # The task completed successfully so we can demonitor it
-    Process.demonitor(ref, [:flush])
-    {:noreply, socket}
-  end
-
-  # Handle Task failure
-  @impl true
-  def handle_info({:DOWN, _ref, :process, _pid, reason}, socket) do
-    # The task failed
-    IO.puts("LLM task failed: #{inspect(reason)}")
-    # We could handle the failure here, e.g., by updating the UI
-    {:noreply, socket |> assign(:loading, false)}
   end
 
   defp ordered_items(conversation) do
