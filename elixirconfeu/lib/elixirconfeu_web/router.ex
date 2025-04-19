@@ -17,7 +17,8 @@ defmodule ElixirConfEUWeb.Router do
   scope "/", ElixirConfEUWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", ChatLive.Index, :index
+    live "/:id", ChatLive.Show, :show
   end
 
   # Other scopes may use custom stacks.
