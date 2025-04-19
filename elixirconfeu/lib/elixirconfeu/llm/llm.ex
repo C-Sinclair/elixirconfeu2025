@@ -13,6 +13,7 @@ defmodule ElixirConfEU.LLM do
   alias LangChain.Chains.LLMChain
   alias LangChain.ChatModels.ChatAnthropic
   alias ElixirConfEU.LLM.Function
+  alias ElixirConfEU.MCPRouter
 
   def chat(conversation_id, user_input) do
     Logger.info("[Chat #{conversation_id}] User input: #{user_input}")
@@ -25,6 +26,7 @@ defmodule ElixirConfEU.LLM do
           conversation_id: conversation_id
         }
       })
+      |> add_mcp_tools()
       |> add_macro_functions()
       |> add_convo_items(Chat.get_conversation!(conversation_id))
       |> LLMChain.add_message(LangChain.Message.new_user!(user_input))
@@ -91,6 +93,19 @@ defmodule ElixirConfEU.LLM do
 
   @introduction PromptTemplate.from_template!(~s(
     You are a helpful assistant that can help with a variety of tasks.
+    You are running in a LiveView app running on localhost:4000
+    You are able to make changes to the currently viewed page, this code exists at `./lib/elixirconfeu_web/live/chat_live/show.ex`.
+    The root of the filesystem you are aware of is `~/Repos/C-Sinclair/elixirconfeu/elixirconfeu`.
+
+    When writing Elixir code, ensure that any modules use the following use macro.
+    ```elixir
+    use ElixirConfEU.LLM.Macros
+    ```
+
+    This is a live view app using daisy UI and tailwind. The daisy UI and tailwind config lives at
+    `./assets/css/app.css`.
+    Changing the theme of DaisyUI can very easily be done the `  name: "night";` on line 2
+    of the `@plugin "../vendor/daisyui-theme" {` block.
     ))
 
   @system_prompt_template PromptTemplate.from_template!(~s(
@@ -108,5 +123,70 @@ defmodule ElixirConfEU.LLM do
       variables
     )
     |> LangChain.Message.new_system!()
+  end
+
+  defp add_mcp_tools(chain) do
+    LLMChain.add_tools(chain, mcp_tools() |> Enum.map(&convert_mcp_tool_to_function/1))
+  end
+
+  @doc """
+  Fetches all available tools from the MCP router and returns them in a format
+  suitable for conversion to LangChain Function structs.
+  """
+  @spec mcp_tools() :: list(map())
+  def mcp_tools do
+    case MCPRouter.list_tools() do
+      {:ok, %Hermes.MCP.Response{result: %{"tools" => tools}}} ->
+        Logger.debug("Found MCP tools: #{inspect(tools, pretty: true)}")
+        tools
+
+      {:error, error} ->
+        Logger.error("Failed to fetch MCP tools: #{inspect(error)}")
+        []
+    end
+  end
+
+  @doc """
+  Converts an MCP tool definition into a LangChain Function struct.
+  """
+  @spec convert_mcp_tool_to_function(map()) :: LangChain.Function.t()
+  def convert_mcp_tool_to_function(%{
+        "name" => name,
+        "description" => description,
+        "inputSchema" => parameters
+      }) do
+    Logger.debug("Converting MCP tool to function: #{name}")
+
+    Function.new_from_mcp!(name, description, parameters, fn arguments, _context ->
+      Logger.debug("Calling tool #{name} with arguments: #{inspect(arguments)}")
+
+      result =
+        case MCPRouter.call_tool(name, arguments, timeout: 120_000, genserver_timeout: 120_000) do
+          {:ok, %Hermes.MCP.Response{result: %{"content" => content}}} when is_list(content) ->
+            Logger.debug("Got list content response: #{inspect(content)}")
+            result = content |> Enum.map_join("\n", & &1["text"])
+            {:ok, result}
+
+          {:ok, %Hermes.MCP.Response{result: %{"content" => content}}}
+          when is_binary(content) ->
+            Logger.debug("Got binary content response: #{inspect(content)}")
+            {:ok, content}
+
+          {:ok, %Hermes.MCP.Response{result: result}} ->
+            Logger.debug("Got other result format: #{inspect(result)}")
+            {:ok, inspect(result)}
+
+          {:error, error} ->
+            Logger.error("Error in tool call: #{inspect(error)}")
+            {:error, to_string(error)}
+
+          other ->
+            Logger.error("Unexpected response format: #{inspect(other)}")
+            {:error, "Unexpected response format"}
+        end
+
+      Logger.debug("Tool #{name} returned: #{inspect(result)}")
+      result
+    end)
   end
 end

@@ -5,7 +5,7 @@ defmodule ElixirConfEU.MixProject do
     [
       app: :elixirconfeu,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -60,6 +60,7 @@ defmodule ElixirConfEU.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:langchain, "0.3.2"},
+      {:hermes_mcp, github: "C-Sinclair/hermes-mcp", branch: "genserver-timeout-opt"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end

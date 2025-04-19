@@ -41,6 +41,38 @@ defmodule ElixirConfEU.LLM.Function do
     })
   end
 
+  def new_from_mcp!(name, description, params, function) do
+    LangChain.Function.new!(%{
+      name: name,
+      description: description,
+      params: params,
+      function: fn arguments, %{conversation_id: conversation_id} = context ->
+        # Create a function call record
+        {:ok, function_call} =
+          Chat.create_function_call(%{
+            module: "[MCP]",
+            function: name,
+            parameters: arguments,
+            conversation_id: conversation_id
+          })
+
+        # broadcast the function call to the client
+        notify_liveview(conversation_id)
+
+        # Call the function itself
+        result = function.(arguments, context)
+
+        # Update the function call with the result
+        {:ok, _function_call} =
+          Chat.complete_function_call(function_call, "#{inspect(result)}")
+
+        notify_liveview(conversation_id)
+
+        result
+      end
+    })
+  end
+
   def get_name(module, function) when is_atom(module) do
     module
     |> Module.split()
