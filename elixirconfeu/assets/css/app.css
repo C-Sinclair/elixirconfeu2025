@@ -14,7 +14,7 @@
    curl -sLO https://github.com/saadeghi/daisyui/releases/latest/download/daisyui.js
    Make sure to look at the daisyUI changelog: https://daisyui.com/docs/changelog/ */
 @plugin "../vendor/daisyui" {
-  themes: false;
+  themes: all;
 }
 
 /* daisyUI theme plugin. You can update this file by fetching the latest version with:
@@ -22,11 +22,11 @@
   We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
   on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
 @plugin "../vendor/daisyui-theme" {
-  name: "dark";
+  name: "night";
   default: false;
   prefersdark: true;
   color-scheme: "dark";
-  --color-base-100: oklch(30.33% 0.016 252.42);
+  /* --color-base-100: oklch(30.33% 0.016 252.42);
   --color-base-200: oklch(25.26% 0.014 253.1);
   --color-base-300: oklch(20.15% 0.012 254.09);
   --color-base-content: oklch(97.807% 0.029 256.847);
@@ -53,7 +53,7 @@
   --size-field: 0.21875rem;
   --border: 1.5px;
   --depth: 1;
-  --noise: 0;
+  --noise: 0; */
 }
 
 @plugin "../vendor/daisyui-theme" {
@@ -97,6 +97,28 @@
 @custom-variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
 
 /* Make LiveView wrapper divs transparent for layout */
-[data-phx-root-id] { display: contents }
+[data-phx-root-id] {
+  display: contents;
+}
 
 /* This file is for your main application CSS */
+body,
+::backdrop {
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+}
+
+input[type="text"] {
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+  border: none;
+  outline: none;
+  box-shadow: none;
+  padding-inline: 1rem;
+
+  &:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+}

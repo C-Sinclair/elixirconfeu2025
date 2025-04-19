@@ -31,7 +31,7 @@ defmodule ElixirConfEUWeb.Layouts do
       </div>
     </header>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
+    <main class="mx-auto max-w-3xl">
       <.flash_group flash={@flash} />
       <div class="h-[calc(100vh-50px)] flex">
         <div class="flex-1 flex flex-col">
