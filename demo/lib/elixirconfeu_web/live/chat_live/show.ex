@@ -136,6 +136,30 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
   defp chat_item(
          %{
            item: %FunctionCall{
+             module: "[MCP]"
+           }
+         } = assigns
+       ) do
+    ~H"""
+    <div class="flex flex-col gap-2 py-2 rounded-md text-sm">
+      <div class="font-mono text-blue-400">
+        {@item.module} {@item.function}
+      </div>
+      <div :if={@item.parameters && is_map(@item.parameters)} class="">
+        <div class="font-semibold text-xs">Parameters:</div>
+        <pre class="text-xs p-1 rounded"><%= Jason.encode!(@item.parameters, pretty: true) %></pre>
+      </div>
+      <div :if={@item.result} class="">
+        <div class="font-semibold text-xs">Result:</div>
+        <pre class="text-xs p-1 rounded"><%= @item.result %></pre>
+      </div>
+    </div>
+    """
+  end
+
+  defp chat_item(
+         %{
+           item: %FunctionCall{
              module: module,
              function: function
            }
@@ -170,7 +194,6 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
   defp get_function_source("[MCP]", _), do: nil
 
   defp get_function_source(module, function) when is_binary(module) do
-    IO.puts("module: #{module}")
     module = String.to_existing_atom(module)
     get_function_source(module, function)
   end
@@ -183,33 +206,100 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
     try do
       # Get the beam file location
       beam_file = :code.which(module)
+      IO.inspect(beam_file, label: "Beam file location")
 
-      # Get the source file from the debug info
-      {:ok, {_, [{:abstract_code, {_, abstract_code}}]}} =
-        :beam_lib.chunks(beam_file, [:abstract_code])
+      case beam_to_source_file(beam_file) do
+        {:ok, source_file} ->
+          IO.inspect(source_file, label: "Found source file")
+          # Read the source file
+          case File.read(source_file) do
+            {:ok, source} ->
+              # Find the function definition
+              result =
+                source
+                |> String.split("\n")
+                |> extract_function(function)
 
-      # Find the function definition in the abstract code
-      case Enum.find(abstract_code, fn
-             {:function, _, ^function, _, _} -> true
-             _ -> false
-           end) do
-        {:function, _, _, _, clauses} ->
-          # Convert the abstract format back to string
-          clauses
-          |> Enum.map_join("\n", fn clause ->
-            ~c"#{:erl_pp.form(clause)}"
-            |> to_string()
-            # Remove the function header
-            |> String.replace(~r/^function.*->\s*/, "")
-            # Normalize whitespace
-            |> String.replace(~r/\s+/, " ")
-          end)
+              IO.inspect(result, label: "Extraction result")
+              result
 
-        _ ->
-          "Function source not found"
+            err ->
+              IO.inspect(err, label: "File read error")
+              "Could not read source file"
+          end
+
+        err ->
+          IO.inspect(err, label: "Source file not found")
+          "Could not find source file"
       end
     rescue
-      _ -> "Could not fetch function source"
+      e ->
+        IO.inspect(e, label: "Error retrieving source")
+        "Could not fetch function source"
+    end
+  end
+
+  defp extract_function(lines, function) do
+    IO.inspect(function, label: "Looking for function")
+
+    {result, _} =
+      Enum.reduce_while(lines, {[], false}, fn
+        line, {acc, true} ->
+          cond do
+            String.match?(line, ~r/^  end$/) ->
+              IO.inspect(line, label: "Found end")
+              {:halt, {Enum.reverse([line | acc]), false}}
+
+            true ->
+              IO.inspect(line, label: "Collecting line")
+              {:cont, {[line | acc], true}}
+          end
+
+        line, {acc, false} ->
+          if String.match?(line, ~r/^  def #{function}.*do$/) do
+            IO.inspect(line, label: "Found function start")
+            {:cont, {[line], true}}
+          else
+            {:cont, {acc, false}}
+          end
+      end)
+
+    case result do
+      [] -> "Function source not found"
+      lines -> Enum.join(lines, "\n")
+    end
+  end
+
+  defp beam_to_source_file(beam_file) do
+    module_path =
+      beam_file
+      |> Path.basename(".beam")
+      |> String.replace_prefix("Elixir.", "")
+      |> String.split(".")
+      |> Enum.map(&Macro.underscore/1)
+      |> Enum.join("/")
+      |> String.replace("elixir_conf_eu", "elixirconfeu")
+      |> Kernel.<>(".ex")
+
+    IO.inspect(module_path, label: "Module path")
+
+    # Try relative to beam file first
+    source_path =
+      beam_file
+      |> Path.dirname()
+      |> Path.join("../lib")
+      |> Path.expand()
+      |> Path.join(module_path)
+
+    IO.inspect(source_path, label: "Trying source path")
+
+    if File.exists?(source_path) do
+      {:ok, source_path}
+    else
+      # Try looking in the current project's lib directory
+      alt_path = Path.join([File.cwd!(), "lib", module_path])
+      IO.inspect(alt_path, label: "Trying alternative path")
+      if File.exists?(alt_path), do: {:ok, alt_path}, else: :error
     end
   end
 end
