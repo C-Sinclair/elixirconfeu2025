@@ -14,7 +14,7 @@ config :elixirconfeu, ElixirConfEU.Repo,
 # you can enable the server option below.
 config :elixirconfeu, ElixirConfEUWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "m3ldsaIG/udydO4d4fzksk/PjQr7QrWbuQRBFkikC+p/+SNK9wkwgyC0qGA0afZ0",
+  secret_key_base: "Q8kDrqvkJvWJJR7sivxCOiO4bM7lcdnGB1MOrCSZddUuivt7zyo678ynCnaGFv5Y",
   server: false
 
 # In test we don't send emails

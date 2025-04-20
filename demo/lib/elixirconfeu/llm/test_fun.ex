@@ -21,8 +21,4 @@ defmodule ElixirConfEU.LLM.TestFun do
   def welcome(_args, _context) do
     "Welcome to ElixirConfEU 2025!"
   end
-
-  def params do
-    @params
-  end
 end

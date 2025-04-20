@@ -133,13 +133,26 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
     """
   end
 
-  defp chat_item(%{item: %FunctionCall{}} = assigns) do
+  defp chat_item(
+         %{
+           item: %FunctionCall{
+             module: module,
+             function: function
+           }
+         } = assigns
+       ) do
+    source = get_function_source(module, function)
+
+    assigns =
+      assigns
+      |> assign(:source, source)
+
     ~H"""
     <div class="flex flex-col gap-2 py-2 rounded-md text-sm">
       <div class="font-mono text-blue-400">
         {@item.module}.{@item.function}/1
       </div>
-      <div class="">
+      <div :if={@item.parameters && is_map(@item.parameters)} class="">
         <div class="font-semibold text-xs">Parameters:</div>
         <pre class="text-xs p-1 rounded"><%= Jason.encode!(@item.parameters, pretty: true) %></pre>
       </div>
@@ -147,7 +160,56 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
         <div class="font-semibold text-xs">Result:</div>
         <pre class="text-xs p-1 rounded"><%= @item.result %></pre>
       </div>
+      <div :if={@source} class="mockup-code w-full">
+        <pre><code><%= @source %></code></pre>
+      </div>
     </div>
     """
+  end
+
+  defp get_function_source("[MCP]", _), do: nil
+
+  defp get_function_source(module, function) when is_binary(module) do
+    IO.puts("module: #{module}")
+    module = String.to_existing_atom(module)
+    get_function_source(module, function)
+  end
+
+  defp get_function_source(module, function) when is_binary(function) do
+    get_function_source(module, String.to_atom(function))
+  end
+
+  defp get_function_source(module, function) when is_atom(module) and is_atom(function) do
+    try do
+      # Get the beam file location
+      beam_file = :code.which(module)
+
+      # Get the source file from the debug info
+      {:ok, {_, [{:abstract_code, {_, abstract_code}}]}} =
+        :beam_lib.chunks(beam_file, [:abstract_code])
+
+      # Find the function definition in the abstract code
+      case Enum.find(abstract_code, fn
+             {:function, _, ^function, _, _} -> true
+             _ -> false
+           end) do
+        {:function, _, _, _, clauses} ->
+          # Convert the abstract format back to string
+          clauses
+          |> Enum.map_join("\n", fn clause ->
+            ~c"#{:erl_pp.form(clause)}"
+            |> to_string()
+            # Remove the function header
+            |> String.replace(~r/^function.*->\s*/, "")
+            # Normalize whitespace
+            |> String.replace(~r/\s+/, " ")
+          end)
+
+        _ ->
+          "Function source not found"
+      end
+    rescue
+      _ -> "Could not fetch function source"
+    end
   end
 end

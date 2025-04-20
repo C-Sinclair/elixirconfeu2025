@@ -13,14 +13,14 @@ config :elixirconfeu, ElixirConfEU.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-# Binding to loopback ipv4 address prevents access from other machines.
 config :elixirconfeu, ElixirConfEUWeb.Endpoint,
+  # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "zD0Wytx8MGeC4l+dqZoeevqRzrI+A11AXkCn8kd+h1Oi4rs+xxJneLbU7cuw3mhk",
+  secret_key_base: "QWD8iLvjMi0Qr4TtmFnzhOrNG97S8HadcluiV6WkxMEhSHIDFEuB7KyPDNY0BrRQ",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:elixirconfeu, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:elixirconfeu, ~w(--watch)]}
@@ -52,6 +52,7 @@ config :elixirconfeu, ElixirConfEUWeb.Endpoint,
 # Watch static and templates for browser reloading.
 config :elixirconfeu, ElixirConfEUWeb.Endpoint,
   live_reload: [
+    web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
@@ -63,7 +64,7 @@ config :elixirconfeu, ElixirConfEUWeb.Endpoint,
 config :elixirconfeu, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :default_formatter, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -73,7 +74,8 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :phoenix_live_view,
-  # Include HEEx debug annotations as HTML comments in rendered markup
+  # Include HEEx debug annotations as HTML comments in rendered markup.
+  # Changing this configuration will require mix clean and a full recompile.
   debug_heex_annotations: true,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
