@@ -173,8 +173,8 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
 
     ~H"""
     <div class="flex flex-col gap-2 py-2 rounded-md text-sm">
-      <div class="font-mono text-blue-400">
-        {@item.module}.{@item.function}/1
+      <div class="font-mono text-info">
+        {String.trim_leading(@item.module, "Elixir.")}.{@item.function}/1
       </div>
       <div :if={@item.parameters && is_map(@item.parameters)} class="">
         <div class="font-semibold text-xs">Parameters:</div>
@@ -184,8 +184,13 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
         <div class="font-semibold text-xs">Result:</div>
         <pre class="text-xs p-1 rounded"><%= @item.result %></pre>
       </div>
-      <div :if={@source} class="mockup-code w-full">
-        <pre><code><%= @source %></code></pre>
+      <div
+        :if={@source}
+        class="mockup-code w-full bg-[#1e1e2e]"
+        id={"source-#{@item.id}"}
+        phx-hook="Highlight"
+        data-source={@source}
+      >
       </div>
     </div>
     """
@@ -221,52 +226,61 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
                 |> extract_function(function)
 
               IO.inspect(result, label: "Extraction result")
+
               result
+              |> String.trim()
 
             err ->
               IO.inspect(err, label: "File read error")
-              "Could not read source file"
+              nil
           end
 
         err ->
           IO.inspect(err, label: "Source file not found")
-          "Could not find source file"
+          nil
       end
     rescue
       e ->
         IO.inspect(e, label: "Error retrieving source")
-        "Could not fetch function source"
+        nil
     end
   end
 
   defp extract_function(lines, function) do
-    IO.inspect(function, label: "Looking for function")
-
     {result, _} =
       Enum.reduce_while(lines, {[], false}, fn
         line, {acc, true} ->
           cond do
             String.match?(line, ~r/^  end$/) ->
-              IO.inspect(line, label: "Found end")
               {:halt, {Enum.reverse([line | acc]), false}}
 
             true ->
-              IO.inspect(line, label: "Collecting line")
               {:cont, {[line | acc], true}}
           end
 
         line, {acc, false} ->
-          if String.match?(line, ~r/^  def #{function}.*do$/) do
-            IO.inspect(line, label: "Found function start")
-            {:cont, {[line], true}}
-          else
-            {:cont, {acc, false}}
+          cond do
+            # Start collecting at @doc
+            String.match?(line, ~r/^  @doc/) ->
+              {:cont, {[line], true}}
+
+            # If we're not already collecting and we find the function, include it
+            String.match?(line, ~r/^  def #{function}.*do$/) ->
+              {:cont, {[line], true}}
+
+            true ->
+              {:cont, {acc, false}}
           end
       end)
 
     case result do
-      [] -> "Function source not found"
-      lines -> Enum.join(lines, "\n")
+      [] ->
+        "Function source not found"
+
+      lines ->
+        lines
+        |> Enum.join("\n")
+        |> String.trim()
     end
   end
 
