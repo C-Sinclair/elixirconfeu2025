@@ -147,7 +147,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
       </div>
       <div :if={@item.parameters && is_map(@item.parameters)} class="">
         <div class="font-semibold text-xs">Parameters:</div>
-        <pre class="text-xs p-1 rounded"><%= Jason.encode!(@item.parameters, pretty: true) %></pre>
+        <.parameters_table parameters={@item.parameters} />
       </div>
       <div :if={@item.result} class="">
         <div class="font-semibold text-xs">Result:</div>
@@ -172,17 +172,14 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
       |> assign(:source, source)
 
     ~H"""
-    <div class="flex flex-col gap-2 py-2 rounded-md text-sm">
-      <div class="font-mono text-info">
+    <div class="flex flex-col gap-4 py-2 rounded-md text-sm">
+      <div class="font-mono text-info flex items-center gap-2">
+        <.icon name="hero-code-bracket" class="w4 h-4" />
         {String.trim_leading(@item.module, "Elixir.")}.{@item.function}/1
       </div>
       <div :if={@item.parameters && is_map(@item.parameters)} class="">
         <div class="font-semibold text-xs">Parameters:</div>
-        <pre class="text-xs p-1 rounded"><%= Jason.encode!(@item.parameters, pretty: true) %></pre>
-      </div>
-      <div :if={@item.result} class="">
-        <div class="font-semibold text-xs">Result:</div>
-        <pre class="text-xs p-1 rounded"><%= @item.result %></pre>
+        <.parameters_table parameters={@item.parameters} />
       </div>
       <div
         :if={@source}
@@ -192,7 +189,30 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
         data-source={@source}
       >
       </div>
+      <div :if={@item.result} class="">
+        <div class="font-semibold text-xs">Result:</div>
+        <pre class="text-xs p-1 rounded"><%= @item.result %></pre>
+      </div>
     </div>
+    """
+  end
+
+  defp parameters_table(assigns) do
+    ~H"""
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr :for={{key, value} <- @parameters}>
+          <td class="w-42">{key}</td>
+          <td>{inspect(value)}</td>
+        </tr>
+      </tbody>
+    </table>
     """
   end
 
