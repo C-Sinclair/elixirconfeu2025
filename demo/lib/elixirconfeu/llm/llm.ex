@@ -101,11 +101,17 @@ defmodule ElixirConfEU.LLM do
     ```elixir
     use ElixirConfEU.LLM.Macros
     ```
+    Always include an expressive @doc comment for any function you write. Make sure the wording is concise and usable by an LLM when selecting whether to run that function.
+    Always make functions arity 2, with the first argument being the `arguments` provided by the LLM and the second being the `context` for the chain. Ignore the context.
+    Always pick Elixir if there is a choice of programming language.
+    Pick random Elixir module names to avoid conflicts.
 
     This is a live view app using daisy UI and tailwind. The daisy UI and tailwind config lives at
     `./assets/css/app.css`.
     Changing the theme of DaisyUI can very easily be done the `  name: "night";` on line 2
     of the `@plugin "../vendor/daisyui-theme" {` block.
+
+    Keep responses very concise and to the point.
     ))
 
   @system_prompt_template PromptTemplate.from_template!(~s(
