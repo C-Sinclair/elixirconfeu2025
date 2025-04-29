@@ -3,7 +3,7 @@ defmodule ElixirConfEU.LLM.TestFun do
   A set of test function for the LLM.
   """
 
-  use ElixirConfEU.LLM.Macros
+  use LLMMagic
 
   @doc """
   Returns the location of the requested element or item.

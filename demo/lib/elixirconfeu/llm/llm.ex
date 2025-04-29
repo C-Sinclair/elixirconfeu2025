@@ -87,7 +87,7 @@ defmodule ElixirConfEU.LLM do
   defp add_macro_functions(chain) do
     LLMChain.add_tools(
       chain,
-      ElixirConfEU.LLM.Macros.get_functions()
+      LLMMagic.get_functions()
     )
   end
 
@@ -99,7 +99,7 @@ defmodule ElixirConfEU.LLM do
 
     When writing Elixir code, ensure that any modules use the following use macro.
     ```elixir
-    use ElixirConfEU.LLM.Macros
+    use LLMMagic
     ```
     Always include an expressive @doc comment for any function you write. Make sure the wording is concise and usable by an LLM when selecting whether to run that function.
     Always make functions arity 2, with the first argument being the `arguments` provided by the LLM and the second being the `context` for the chain. Ignore the context.

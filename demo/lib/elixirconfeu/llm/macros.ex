@@ -1,4 +1,4 @@
-defmodule ElixirConfEU.LLM.Macros do
+defmodule LLMMagic do
   @moduledoc """
   This module provides a macro for registering functions as tools for the LLM.
   """
