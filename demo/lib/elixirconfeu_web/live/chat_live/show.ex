@@ -276,27 +276,31 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
 
   defp extract_function(lines, function) do
     # First find the starting line of our target function
-    {start_index, has_doc} =
+    {start_index, doc_lines} =
       Enum.with_index(lines)
-      |> Enum.reduce_while(nil, fn
-        {line, idx}, nil ->
+      |> Enum.reduce_while({nil, []}, fn
+        {line, idx}, {nil, acc} ->
           cond do
             # Found the function definition
             String.match?(line, ~r/^  def #{function}.*do$/) ->
-              {:halt, {idx, false}}
+              # Look back for doc string
+              preceding_lines = Enum.take(lines, idx)
 
-            # Found the doc string, check next line
-            String.match?(line, ~r/^  @doc/) ->
-              next_line = Enum.at(lines, idx + 1)
+              doc_start_idx =
+                Enum.find_index(Enum.reverse(preceding_lines), fn l ->
+                  String.match?(l, ~r/^  @doc/)
+                end)
 
-              if next_line && String.match?(next_line, ~r/^  def #{function}.*do$/) do
-                {:halt, {idx, true}}
+              if doc_start_idx do
+                actual_idx = length(preceding_lines) - doc_start_idx - 1
+                doc_lines = Enum.slice(lines, actual_idx..(idx - 1))
+                {:halt, {idx, doc_lines}}
               else
-                {:cont, nil}
+                {:halt, {idx, []}}
               end
 
             true ->
-              {:cont, nil}
+              {:cont, {nil, acc}}
           end
       end)
 
@@ -309,32 +313,25 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
         # Keep track of nested do/end blocks
         {result, _} =
           lines
-          |> Enum.drop(if has_doc, do: idx, else: idx)
+          |> Enum.drop(idx)
           |> Enum.reduce_while({[], 0}, fn line, {acc, depth} ->
-            cond do
-              # Increase depth for do blocks
-              String.match?(line, ~r/.*do\s*$/) ->
-                {:cont, {[line | acc], depth + 1}}
+            new_depth =
+              cond do
+                # Increase depth for do blocks
+                String.match?(line, ~r/.*do\s*$/) -> depth + 1
+                # Decrease depth for end blocks
+                String.match?(line, ~r/^  end/) && depth > 0 -> depth - 1
+                true -> depth
+              end
 
-              # Decrease depth for end blocks
-              String.match?(line, ~r/^  end/) && depth > 0 ->
-                if depth == 1 do
-                  {:halt, {[line | acc], depth - 1}}
-                else
-                  {:cont, {[line | acc], depth - 1}}
-                end
-
-              # Keep collecting lines while we're inside the function
-              depth > 0 ->
-                {:cont, {[line | acc], depth}}
-
-              true ->
-                {:cont, {acc, depth}}
+            if new_depth == 0 && String.match?(line, ~r/^  end/) do
+              {:halt, {[line | acc], new_depth}}
+            else
+              {:cont, {[line | acc], new_depth}}
             end
           end)
 
-        result
-        |> Enum.reverse()
+        (doc_lines ++ Enum.reverse(result))
         |> Enum.join("\n")
         |> String.trim()
     end
