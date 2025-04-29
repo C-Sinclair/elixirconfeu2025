@@ -185,6 +185,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
         :if={@source}
         class="mockup-code w-full bg-[#1e1e2e]"
         id={"source-#{@item.id}"}
+        phx-update="ignore"
         phx-hook="Highlight"
         data-source={@source}
       >
