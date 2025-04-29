@@ -12,7 +12,7 @@ defmodule ElixirConfEU.LLM do
   alias Phoenix.PubSub
   alias LangChain.Chains.LLMChain
   alias LangChain.ChatModels.ChatAnthropic
-  alias LangChain.ChatModels.ChatOpenAI
+  # alias LangChain.ChatModels.ChatOpenAI
   alias ElixirConfEU.LLM.Function
   alias ElixirConfEU.MCPRouter
 
@@ -21,7 +21,7 @@ defmodule ElixirConfEU.LLM do
 
     {:ok, %LLMChain{} = chain} =
       LLMChain.new!(%{
-        llm: openai(),
+        llm: claude(),
         verbose: true,
         custom_context: %{
           conversation_id: conversation_id
@@ -49,9 +49,9 @@ defmodule ElixirConfEU.LLM do
     )
   end
 
-  # defp claude, do: ChatAnthropic.new!(%{model: "claude-3-5-sonnet-20240620"})
+  defp claude, do: ChatAnthropic.new!(%{model: "claude-3-5-sonnet-20240620"})
 
-  defp openai, do: ChatOpenAI.new!(%{model: "gpt-4.1-2025-04-14"})
+  # defp openai, do: ChatOpenAI.new!(%{model: "gpt-4.1-2025-04-14"})
 
   defp add_convo_items(chain, %Conversation{messages: messages, function_calls: function_calls}) do
     convo_items =
@@ -106,8 +106,10 @@ defmodule ElixirConfEU.LLM do
     ```
     Always include an expressive @doc comment for any function you write. Make sure the wording is concise and usable by an LLM when selecting whether to run that function.
     Always make functions arity 2, with the first argument being the `arguments` provided by the LLM and the second being the `context` for the chain. Ignore the context.
+    Always return type strings from functions you write.
     Always pick Elixir if there is a choice of programming language.
     Pick random Elixir module names to avoid conflicts.
+    Place elixir modules in the `./lib/elixirconfeu/` directory in the typical location which would match the module's name.
 
     This is a live view app using daisy UI and tailwind. The daisy UI and tailwind config lives at
     `./assets/css/app.css`.
