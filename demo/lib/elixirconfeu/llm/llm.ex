@@ -12,6 +12,7 @@ defmodule ElixirConfEU.LLM do
   alias Phoenix.PubSub
   alias LangChain.Chains.LLMChain
   alias LangChain.ChatModels.ChatAnthropic
+  alias LangChain.ChatModels.ChatOpenAI
   alias ElixirConfEU.LLM.Function
   alias ElixirConfEU.MCPRouter
 
@@ -20,7 +21,7 @@ defmodule ElixirConfEU.LLM do
 
     {:ok, %LLMChain{} = chain} =
       LLMChain.new!(%{
-        llm: claude(),
+        llm: openai(),
         verbose: true,
         custom_context: %{
           conversation_id: conversation_id
@@ -48,7 +49,9 @@ defmodule ElixirConfEU.LLM do
     )
   end
 
-  defp claude, do: ChatAnthropic.new!(%{model: "claude-3-5-sonnet-20240620"})
+  # defp claude, do: ChatAnthropic.new!(%{model: "claude-3-5-sonnet-20240620"})
+
+  defp openai, do: ChatOpenAI.new!(%{model: "gpt-4.1-2025-04-14"})
 
   defp add_convo_items(chain, %Conversation{messages: messages, function_calls: function_calls}) do
     convo_items =
