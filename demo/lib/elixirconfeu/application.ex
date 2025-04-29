@@ -21,19 +21,19 @@ defmodule ElixirConfEU.Application do
       ElixirConfEUWeb.Endpoint,
       # MCP related bits
 
-      Supervisor.child_spec(
-        {Hermes.Transport.STDIO,
-         [
-           name: ElixirConfEU.PerplexityTransport,
-           client: ElixirConfEU.PerplexityClient,
-           command: "bunx",
-           args: ["server-perplexity-ask"],
-           env: %{
-             "PERPLEXITY_API_KEY" => perplexity_api_key()
-           }
-         ]},
-        id: :perplexity_transport
-      ),
+      # Supervisor.child_spec(
+      #   {Hermes.Transport.STDIO,
+      #    [
+      #      name: ElixirConfEU.PerplexityTransport,
+      #      client: ElixirConfEU.PerplexityClient,
+      #      command: "bunx",
+      #      args: ["server-perplexity-ask"],
+      #      env: %{
+      #        "PERPLEXITY_API_KEY" => perplexity_api_key()
+      #      }
+      #    ]},
+      #   id: :perplexity_transport
+      # ),
       Supervisor.child_spec(
         {Hermes.Transport.STDIO,
          [
@@ -48,23 +48,23 @@ defmodule ElixirConfEU.Application do
         id: :filesystem_transport
       ),
       # Then start clients that use those transports
-      Supervisor.child_spec(
-        {Hermes.Client,
-         [
-           name: ElixirConfEU.PerplexityClient,
-           transport: [
-             layer: Hermes.Transport.STDIO,
-             name: ElixirConfEU.PerplexityTransport
-           ],
-           client_info: %{
-             "name" => "ElixirConfEU",
-             "version" => "0.1.0"
-           },
-           request_timeout: 120_000,
-           timeout: 120_000
-         ]},
-        id: :perplexity_client
-      ),
+      # Supervisor.child_spec(
+      #   {Hermes.Client,
+      #    [
+      #      name: ElixirConfEU.PerplexityClient,
+      #      transport: [
+      #        layer: Hermes.Transport.STDIO,
+      #        name: ElixirConfEU.PerplexityTransport
+      #      ],
+      #      client_info: %{
+      #        "name" => "ElixirConfEU",
+      #        "version" => "0.1.0"
+      #      },
+      #      request_timeout: 120_000,
+      #      timeout: 120_000
+      #    ]},
+      #   id: :perplexity_client
+      # ),
       Supervisor.child_spec(
         {Hermes.Client,
          [
@@ -84,7 +84,12 @@ defmodule ElixirConfEU.Application do
       ),
       # Finally start the router
       {ElixirConfEU.MCPRouter,
-       [clients: [ElixirConfEU.PerplexityClient, ElixirConfEU.FilesystemClient]]}
+       [
+         clients: [
+           # ElixirConfEU.PerplexityClient,
+           ElixirConfEU.FilesystemClient
+         ]
+       ]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
