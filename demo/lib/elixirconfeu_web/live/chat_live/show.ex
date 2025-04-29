@@ -149,10 +149,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
         <div class="font-semibold text-xs">Parameters:</div>
         <.parameters_table parameters={@item.parameters} />
       </div>
-      <div :if={@item.result} class="">
-        <div class="font-semibold text-xs">Result:</div>
-        <pre class="text-xs p-1 rounded"><%= @item.result %></pre>
-      </div>
+      <.results item={@item} />
     </div>
     """
   end
@@ -190,9 +187,17 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
         data-source={@source}
       >
       </div>
-      <div :if={@item.result} class="">
-        <div class="font-semibold text-xs">Result:</div>
-        <pre class="text-xs p-1 rounded"><%= @item.result %></pre>
+      <.results item={@item} />
+    </div>
+    """
+  end
+
+  defp results(assigns) do
+    ~H"""
+    <div :if={@item.result} class="bg-success/10 rounded-box px-4 py-6 w-3xl">
+      <div class="flex items-center gap-3">
+        <.icon name="hero-check-circle" class="w-5 h-5 text-success" />
+        <pre class="text-sm font-bold w-full overflow-hidden"><%= @item.result |> String.trim_leading("\"") |> String.trim_trailing("\"") %></pre>
       </div>
     </div>
     """
@@ -209,8 +214,8 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
       </thead>
       <tbody>
         <tr :for={{key, value} <- @parameters}>
-          <td class="w-42">{key}</td>
-          <td>{inspect(value)}</td>
+          <td class="w-8">{key}</td>
+          <td class="w-24">{inspect(value)}</td>
         </tr>
       </tbody>
     </table>
