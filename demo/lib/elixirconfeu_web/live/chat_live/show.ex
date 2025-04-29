@@ -125,7 +125,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
 
   defp chat_item(%{item: %Message{}} = assigns) do
     ~H"""
-    <div class="py-4 max-w-3xl">
+    <div class="py-4 max-w-3xl" phx-hook="ScrollToBottom" id={"message-#{@item.id}"}>
       <div class={if @item.role == "user", do: "text-4xl", else: ""}>
         {@item.content}
       </div>
@@ -141,7 +141,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
          } = assigns
        ) do
     ~H"""
-    <div class="flex flex-col gap-2 py-2 rounded-md text-sm">
+    <div class="flex flex-col gap-2 py-2 rounded-md text-sm" phx-hook="ScrollToBottom" id={"message-#{@item.id}"}>
       <div class="font-mono text-blue-400">
         {@item.module} {@item.function}
       </div>
@@ -172,7 +172,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
       |> assign(:source, source)
 
     ~H"""
-    <div class="flex flex-col gap-4 py-2 rounded-md text-sm">
+    <div class="flex flex-col gap-4 py-2 rounded-md text-sm" phx-hook="ScrollToBottom" id={"message-#{@item.id}"}>
       <div class="font-mono text-info flex items-center gap-2">
         <.icon name="hero-code-bracket" class="w4 h-4" />
         {String.trim_leading(@item.module, "Elixir.")}.{@item.function}/1
@@ -230,6 +230,8 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
 
   defp get_function_source(module, function) when is_atom(module) and is_atom(function) do
     try do
+      IO.inspect({module, function}, label: "Module and function")
+
       # Get the beam file location
       beam_file = :code.which(module)
       IO.inspect(beam_file, label: "Beam file location")
@@ -268,38 +270,66 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
   end
 
   defp extract_function(lines, function) do
-    {result, _} =
-      Enum.reduce_while(lines, {[], false}, fn
-        line, {acc, true} ->
+    # First find the starting line of our target function
+    {start_index, has_doc} =
+      Enum.with_index(lines)
+      |> Enum.reduce_while(nil, fn
+        {line, idx}, nil ->
           cond do
-            String.match?(line, ~r/^  end$/) ->
-              {:halt, {Enum.reverse([line | acc]), false}}
-
-            true ->
-              {:cont, {[line | acc], true}}
-          end
-
-        line, {acc, false} ->
-          cond do
-            # Start collecting at @doc
-            String.match?(line, ~r/^  @doc/) ->
-              {:cont, {[line], true}}
-
-            # If we're not already collecting and we find the function, include it
+            # Found the function definition
             String.match?(line, ~r/^  def #{function}.*do$/) ->
-              {:cont, {[line], true}}
+              {:halt, {idx, false}}
+
+            # Found the doc string, check next line
+            String.match?(line, ~r/^  @doc/) ->
+              next_line = Enum.at(lines, idx + 1)
+
+              if next_line && String.match?(next_line, ~r/^  def #{function}.*do$/) do
+                {:halt, {idx, true}}
+              else
+                {:cont, nil}
+              end
 
             true ->
-              {:cont, {acc, false}}
+              {:cont, nil}
           end
       end)
 
-    case result do
-      [] ->
+    case start_index do
+      nil ->
         "Function source not found"
 
-      lines ->
-        lines
+      idx ->
+        # Now collect lines until we find the matching end
+        # Keep track of nested do/end blocks
+        {result, _} =
+          lines
+          |> Enum.drop(if has_doc, do: idx, else: idx)
+          |> Enum.reduce_while({[], 0}, fn line, {acc, depth} ->
+            cond do
+              # Increase depth for do blocks
+              String.match?(line, ~r/.*do\s*$/) ->
+                {:cont, {[line | acc], depth + 1}}
+
+              # Decrease depth for end blocks
+              String.match?(line, ~r/^  end/) && depth > 0 ->
+                if depth == 1 do
+                  {:halt, {[line | acc], depth - 1}}
+                else
+                  {:cont, {[line | acc], depth - 1}}
+                end
+
+              # Keep collecting lines while we're inside the function
+              depth > 0 ->
+                {:cont, {[line | acc], depth}}
+
+              true ->
+                {:cont, {acc, depth}}
+            end
+          end)
+
+        result
+        |> Enum.reverse()
         |> Enum.join("\n")
         |> String.trim()
     end
