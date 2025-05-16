@@ -49,7 +49,9 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
   end
 
   @impl true
-  def handle_info({:llm_response, conversation_id}, socket) do
+  def handle_info({:llm_response, conversation_id, opts}, socket) do
+    done? = Keyword.get(opts, :done?)
+
     if socket.assigns.conversation &&
          socket.assigns.conversation.id == conversation_id do
       conversation = Chat.get_conversation!(conversation_id)
@@ -57,7 +59,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
       {:noreply,
        socket
        |> assign(:conversation, conversation)
-       |> assign(:loading, false)}
+       |> assign(:loading, !done?)}
     else
       {:noreply, socket}
     end
@@ -88,11 +90,27 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
-      <div id="chat-root" phx-hook="Confetti">
+      <div id="chat-root" phx-hook="Confetti" class="h-full flex flex-col">
       <div class="flex-1 p-4">
         <div class="space-y-4">
           <.chat_item :for={item <- ordered_items(@conversation)} item={item} />
         </div>
+      </div>
+
+      <div :if={@loading} class="flex px-4">
+        <span class="animate-shimmer bg-gradient-to-r from-blue-400 via-stone-500 to-orange-500 bg-clip-text text-transparent font-bold text-2xl tracking-wide">
+          thinking…
+        </span>
+        <style>
+          @keyframes shimmer {
+            0% { background-position: -500px 0; }
+            100% { background-position: 500px 0; }
+          }
+          .animate-shimmer {
+            background-size: 200% 100%;
+            animation: shimmer 2s linear infinite;
+          }
+        </style>
       </div>
 
       <div class="py-4 flex flex-col justify-center">
@@ -241,15 +259,14 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
 
   defp get_function_source(module, function) when is_atom(module) and is_atom(function) do
     try do
-      IO.inspect({module, function}, label: "Module and function")
+      # IO.inspect({module, function}, label: "Module and function")
 
       # Get the beam file location
       beam_file = :code.which(module)
-      IO.inspect(beam_file, label: "Beam file location")
+      # IO.inspect(beam_file, label: "Beam file location")
 
       case beam_to_source_file(beam_file) do
         {:ok, source_file} ->
-          IO.inspect(source_file, label: "Found source file")
           # Read the source file
           case File.read(source_file) do
             {:ok, source} ->
@@ -259,7 +276,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
                 |> String.split("\n")
                 |> extract_function(function)
 
-              IO.inspect(result, label: "Extraction result")
+              # IO.inspect(result, label: "Extraction result")
 
               result
               |> String.trim()
@@ -354,7 +371,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
       |> String.replace("elixir_conf_eu", "elixirconfeu")
       |> Kernel.<>(".ex")
 
-    IO.inspect(module_path, label: "Module path")
+    # IO.inspect(module_path, label: "Module path")
 
     # Try relative to beam file first
     source_path =
@@ -364,14 +381,14 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
       |> Path.expand()
       |> Path.join(module_path)
 
-    IO.inspect(source_path, label: "Trying source path")
+    # IO.inspect(source_path, label: "Trying source path")
 
     if File.exists?(source_path) do
       {:ok, source_path}
     else
       # Try looking in the current project's lib directory
       alt_path = Path.join([File.cwd!(), "lib", module_path])
-      IO.inspect(alt_path, label: "Trying alternative path")
+      # IO.inspect(alt_path, label: "Trying alternative path")
       if File.exists?(alt_path), do: {:ok, alt_path}, else: :error
     end
   end

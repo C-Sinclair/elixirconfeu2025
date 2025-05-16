@@ -90,7 +90,7 @@ defmodule ElixirConfEU.LLM.Function do
     PubSub.broadcast(
       ElixirConfEU.PubSub,
       "llm:responses",
-      {:llm_response, conversation_id}
+      {:llm_response, conversation_id, done?: false}
     )
   end
 end

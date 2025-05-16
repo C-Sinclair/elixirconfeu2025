@@ -42,7 +42,7 @@ defmodule ElixirConfEU.LLM do
     PubSub.broadcast(
       ElixirConfEU.PubSub,
       "llm:responses",
-      {:llm_response, conversation_id}
+      {:llm_response, conversation_id, done?: true}
     )
   end
 
