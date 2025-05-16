@@ -16,9 +16,7 @@ defmodule ElixirConfEU.LLM do
   alias ElixirConfEU.LLM.Function
   alias ElixirConfEU.MCPRouter
 
-  def chat(conversation_id, user_input) do
-    Logger.info("[Chat #{conversation_id}] User input: #{user_input}")
-
+  def chat(conversation_id) do
     {:ok, %LLMChain{} = chain} =
       LLMChain.new!(%{
         llm: claude(),
@@ -30,7 +28,6 @@ defmodule ElixirConfEU.LLM do
       |> add_mcp_tools()
       |> add_macro_functions()
       |> add_convo_items(Chat.get_conversation!(conversation_id))
-      |> LLMChain.add_message(LangChain.Message.new_user!(user_input))
       |> LLMChain.run(mode: :while_needs_response)
 
     # Store the assistant message in the database

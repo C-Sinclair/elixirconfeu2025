@@ -35,7 +35,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
 
     # Start an independent supervised task that will survive navigation
     Task.Supervisor.async_nolink(ElixirConfEU.TaskSupervisor, fn ->
-      ElixirConfEU.LLM.chat(conversation.id, user_input)
+      ElixirConfEU.LLM.chat(conversation.id)
     end)
 
     messages = conversation.messages ++ [message]
