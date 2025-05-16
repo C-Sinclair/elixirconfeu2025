@@ -113,6 +113,11 @@ defmodule ElixirConfEU.LLM do
     Changing the theme of DaisyUI can very easily be done the `  name: "night";` on line 2
     of the `@plugin "../vendor/daisyui-theme" {` block.
 
+    If you want to trigger confetti, the liveview already listens to a pubsub channel, so it can easily be triggered by calling
+    ```elixir
+    PubSub.broadcast\(ElixirConfEU.PubSub, "llm:responses", {:confetti}\)
+    ```
+
     Keep responses very concise and to the point.
     ))
 

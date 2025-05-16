@@ -25,6 +25,7 @@ import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 import Highlight from "./hooks/highlighter.js";
 import ScrollToBottom from "./hooks/scroll-to-bottom.js";
+import Confetti from "./hooks/confetti.js";
 
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")
@@ -35,6 +36,7 @@ const liveSocket = new LiveSocket("/live", Socket, {
   hooks: {
     Highlight,
     ScrollToBottom,
+    Confetti,
   },
 });
 

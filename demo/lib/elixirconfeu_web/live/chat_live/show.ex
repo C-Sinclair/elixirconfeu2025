@@ -80,10 +80,15 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
     {:noreply, socket |> assign(:loading, false)}
   end
 
+  def handle_info({:confetti}, socket) do
+    {:noreply, push_event(socket, "confetti", %{particleCount: 500, spread: 360})}
+  end
+
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash}>
+      <div id="chat-root" phx-hook="Confetti">
       <div class="flex-1 p-4 overflow-y-auto">
         <div class="space-y-4">
           <.chat_item :for={item <- ordered_items(@conversation)} item={item} />
@@ -112,6 +117,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
             Send
           </button>
         </form>
+        </div>
       </div>
     </Layouts.app>
     """

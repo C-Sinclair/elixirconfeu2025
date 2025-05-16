@@ -11,7 +11,7 @@ defmodule ElixirConfEU.MCPRouter do
   @type client_name :: atom()
   @type tool_name :: String.t()
 
-  @max_retries 3
+  @max_retries 10
   @retry_delay 1000
 
   # Client API
