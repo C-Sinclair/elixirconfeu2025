@@ -89,7 +89,7 @@ defmodule ElixirConfEUWeb.ChatLive.Show do
     ~H"""
     <Layouts.app flash={@flash}>
       <div id="chat-root" phx-hook="Confetti">
-      <div class="flex-1 p-4 overflow-y-auto">
+      <div class="flex-1 p-4">
         <div class="space-y-4">
           <.chat_item :for={item <- ordered_items(@conversation)} item={item} />
         </div>
