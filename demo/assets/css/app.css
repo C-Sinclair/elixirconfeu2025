@@ -22,7 +22,7 @@
   We ship with two themes, a light one inspired on Phoenix colors and a dark one inspired
   on Elixir colors. Build your own at: https://daisyui.com/theme-generator/ */
 @plugin "../vendor/daisyui-theme" {
-  name: "night";
+  name: "light";
   default: false;
   prefersdark: true;
   color-scheme: "dark";
